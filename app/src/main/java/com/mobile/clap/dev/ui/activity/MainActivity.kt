@@ -1,10 +1,15 @@
 package com.mobile.clap.dev.ui.activity
 
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -31,6 +36,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var switchVibration: MaterialSwitch
     private lateinit var switchFlashlight: MaterialSwitch
 
+    companion object {
+        private const val PREF_NAME = "home_guide_prefs"
+        private const val KEY_GUIDE_SHOWN = "guide_shown"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -42,6 +52,41 @@ class MainActivity : AppCompatActivity() {
         styleSwitches()
         setupListeners()
         updateToggleUI(isDetectionOn, animate = false)
+        showGuideIfFirstLaunch()
+    }
+
+    private fun showGuideIfFirstLaunch() {
+        val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        if (prefs.getBoolean(KEY_GUIDE_SHOWN, false)) return
+
+        val rootView = findViewById<FrameLayout>(R.id.main)
+
+        // Apply blur to the main content (API 31+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            for (i in 0 until rootView.childCount) {
+                rootView.getChildAt(i).setRenderEffect(
+                    RenderEffect.createBlurEffect(25f, 25f, Shader.TileMode.CLAMP)
+                )
+            }
+        }
+
+        // Inflate guide overlay
+        val guideOverlay = LayoutInflater.from(this)
+            .inflate(R.layout.layout_home_guide_overlay, rootView, false)
+        rootView.addView(guideOverlay)
+
+        // Dismiss on tap
+        guideOverlay.setOnClickListener {
+            rootView.removeView(guideOverlay)
+            // Remove blur
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                for (i in 0 until rootView.childCount) {
+                    rootView.getChildAt(i).setRenderEffect(null)
+                }
+            }
+            // Mark guide as shown
+            prefs.edit().putBoolean(KEY_GUIDE_SHOWN, true).apply()
+        }
     }
 
     private fun setupEdgeToEdge() {
@@ -79,16 +124,14 @@ class MainActivity : AppCompatActivity() {
         val trackBg = if (isOn) R.drawable.bg_main_toggle_track_on else R.drawable.bg_main_toggle_track_off
         toggleTrack.setBackgroundResource(trackBg)
 
-        tvToggleLabel.text = if (isOn) "ON" else "Off"
+        tvToggleLabel.text = getString(if (isOn) R.string.home_toggle_on else R.string.home_toggle_off)
         tvToggleLabel.setTextColor(
             if (isOn) getColor(R.color.main_purple_dark) else Color.parseColor("#C9A0E0")
         )
 
-        tvDetectionStatus.text = if (isOn) {
-            "Clap & Whistle  Detection is ON"
-        } else {
-            "Clap & Whistle  Detection is OFF"
-        }
+        tvDetectionStatus.text = getString(
+            if (isOn) R.string.home_detection_on else R.string.home_detection_off
+        )
 
         val thumbParams = toggleThumb.layoutParams as FrameLayout.LayoutParams
         val newGravity = if (isOn) {
