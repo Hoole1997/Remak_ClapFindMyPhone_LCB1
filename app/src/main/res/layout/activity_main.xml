@@ -1,19 +1,420 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:background="@color/main_bg"
+    tools:context=".ui.activity.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- Purple header background -->
+    <View
+        android:id="@+id/headerBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_main_header" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Decorative overlay image on header (user sets src) -->
+    <ImageView
+        android:id="@+id/ivHeaderOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:alpha="0.56"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        android:src="@mipmap/img_home_cloud"/>
+
+    <!-- Scrollable content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Status bar spacer -->
+            <View
+                android:id="@+id/statusBarSpacer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp" />
+
+            <!-- App Name Title -->
+            <TextView
+                android:id="@+id/tvAppName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-bold"
+                android:text="@string/app_name"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
+
+            <!-- Main Icon -->
+            <ImageView
+                android:id="@+id/ivMainIcon"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="24dp"
+                android:importantForAccessibility="no"
+                android:src="@mipmap/img_home_avatar" />
+
+            <!-- Detection Status Text -->
+            <TextView
+                android:id="@+id/tvDetectionStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                tools:text="Clap &amp; Whistle  Detection is ON" />
+
+            <!-- Main Toggle Button -->
+            <FrameLayout
+                android:id="@+id/toggleMainContainer"
+                android:layout_width="130dp"
+                android:layout_height="44dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="18dp"
+                android:clipChildren="false">
+
+                <View
+                    android:id="@+id/toggleTrack"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_main_toggle_track_on" />
+
+                <FrameLayout
+                    android:id="@+id/toggleThumb"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_main_toggle_thumb">
+
+                    <TextView
+                        android:id="@+id/tvToggleLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="ON"
+                        android:textColor="@color/main_purple_dark"
+                        android:textSize="14sp" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- White Content Area -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_content_top_rounded"
+                android:orientation="vertical"
+                android:paddingHorizontal="15dp"
+                android:paddingTop="24dp"
+                android:paddingBottom="24dp">
+
+                <!-- Two Cards Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Clap Card -->
+                    <LinearLayout
+                        android:id="@+id/cardClap"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="7dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_card_clap"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivClap"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@mipmap/img_home_clap_icon"
+                            android:importantForAccessibility="no"
+                            android:layout_marginTop="16dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center"
+                            android:text="Find Phone by\nClap"
+                            android:textColor="@color/text_dark"
+                            android:textSize="14sp" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/switchClap"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:layout_marginBottom="8dp"/>
+                    </LinearLayout>
+
+                    <!-- Whistle Card -->
+                    <LinearLayout
+                        android:id="@+id/cardWhistle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="7dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_card_whistle"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="16dp">
+
+                        <ImageView
+                            android:id="@+id/ivWhistle"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginTop="16dp"
+                            android:src="@mipmap/img_home_whistle_icon"
+                            android:importantForAccessibility="no" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:gravity="center"
+                            android:text="Find Phone by\nWhistle"
+                            android:textColor="@color/text_dark"
+                            android:textSize="14sp" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/switchWhistle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:layout_marginBottom="8dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Sound Item -->
+                <LinearLayout
+                    android:id="@+id/itemSound"
+                    android:layout_width="match_parent"
+                    android:layout_height="66dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_setting_item"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivSound"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@mipmap/img_home_sound_icon"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Sound"
+                        android:textColor="@color/text_dark"
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switchSound"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false" />
+                </LinearLayout>
+
+                <!-- Vibration Item -->
+                <LinearLayout
+                    android:id="@+id/itemVibration"
+                    android:layout_width="match_parent"
+                    android:layout_height="66dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_setting_item"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivVibration"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@mipmap/img_home_vibration_icon"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Vibration"
+                        android:textColor="@color/text_dark"
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switchVibration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true" />
+                </LinearLayout>
+
+                <!-- Flashlight Item -->
+                <LinearLayout
+                    android:id="@+id/itemFlashlight"
+                    android:layout_width="match_parent"
+                    android:layout_height="66dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_setting_item"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivFlashlight"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@mipmap/img_home_flashlight_icon"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Flashlight"
+                        android:textColor="@color/text_dark"
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switchFlashlight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true" />
+                </LinearLayout>
+
+                <!-- Alert Sound Item -->
+                <LinearLayout
+                    android:id="@+id/itemAlertSound"
+                    android:layout_width="match_parent"
+                    android:layout_height="66dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_setting_item"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivAlertSound"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@mipmap/img_home_alert_sound_icon"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Alert Sound"
+                        android:textColor="@color/text_dark"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvAlertSoundValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:text="Bell"
+                        android:textColor="@color/text_medium"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/ivAlertSoundArrow"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="4dp"
+                        android:importantForAccessibility="no" />
+                </LinearLayout>
+
+                <!-- Alert Duration Item -->
+                <LinearLayout
+                    android:id="@+id/itemAlertDuration"
+                    android:layout_width="match_parent"
+                    android:layout_height="66dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_setting_item"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivAlertDuration"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@mipmap/img_home_alert_duration_icon"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Alert Duration"
+                        android:textColor="@color/text_dark"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvAlertDurationValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:text="10 sec"
+                        android:textColor="@color/text_medium"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/ivAlertDurationArrow"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="4dp"
+                        android:importantForAccessibility="no" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</FrameLayout>
