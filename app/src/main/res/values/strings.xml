@@ -19,6 +19,11 @@
     <string name="home_alert_sound_bell">Bell</string>
     <string name="home_alert_duration_10sec">10 sec</string>
 
+    <string name="setting_alert_sound_title">Alert Sound</string>
+    <string name="setting_alert_sound_volume">Alert Sound Volume</string>
+    <string name="setting_tap_to_play_sound">Tap to play Sound</string>
+    <string name="setting_save">Save</string>
+
     <string name="guide_intro_line1">Tap the <font color="#FFEC17">switch</font> to turn on phone\ntracking.</string>
     <string name="guide_intro_line2">When tracking is <font color="#FFEC17">ON</font>, you\'ll be able\nto find your phone by clapping or\nwhistling.</string>
 </resources>

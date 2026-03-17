@@ -251,7 +251,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.itemAlertSound).setOnClickListener {
-            // TODO: Open alert sound picker
+            startActivity(android.content.Intent(this, AlertSoundActivity::class.java))
         }
 
         findViewById<View>(R.id.itemAlertDuration).setOnClickListener {
