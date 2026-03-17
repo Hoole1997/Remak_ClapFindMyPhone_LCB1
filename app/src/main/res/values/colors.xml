@@ -2,4 +2,20 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="main_purple">#CC8EF1</color>
+    <color name="main_purple_dark">#A242DA</color>
+    <color name="main_bg">#F2F1F6</color>
+    <color name="card_clap_bg">#FFEFE2</color>
+    <color name="card_whistle_bg">#F3E8FA</color>
+    <color name="setting_item_bg">#FAFAFA</color>
+    <color name="text_dark">#FF333333</color>
+    <color name="text_medium">#FF666666</color>
+    <color name="switch_orange_track">#FF8F26</color>
+    <color name="switch_off_orange_track">#4DFF8F26</color>
+    <color name="switch_purple_track">#BF58FF</color>
+    <color name="switch_off_purple_track">#4DBF58FF</color>
+    <color name="switch_blue_track">#34C3FF</color>
+    <color name="switch_off_track">#B8D8F8</color>
+    <color name="toggle_off_track">#CCCCCC</color>
 </resources>

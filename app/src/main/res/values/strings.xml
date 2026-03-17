@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ClapFindMyPhone</string>
+    <string name="splash_title">Lost Your Phone? Just\nClap or Whistle!</string>
+    <string name="splash_get_started">Get Started</string>
+    <string name="splash_privacy_policy">Privacy Policy</string>
+    <string name="splash_terms_of_service">Terms of Service</string>
 </resources>

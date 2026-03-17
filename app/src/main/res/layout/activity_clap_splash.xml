@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_splash_gradient"
+    tools:context="com.mobile.clap.dev.ui.activity.ClapSplashActivity">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:lineSpacingExtra="4dp"
+        android:text="@string/splash_title"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guidelineTop" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.11" />
+
+    <!-- Center card background -->
+    <View
+        android:id="@+id/cardBg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_splash_card"
+        app:layout_constraintBottom_toBottomOf="@id/guidelineCardBottom"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="14dp"
+        app:layout_constraintDimensionRatio="249:496"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guidelineCardTop" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineCardTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.20" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineCardBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.81" />
+
+    <!-- Center app screenshot image (inside card) -->
+    <ImageView
+        android:id="@+id/ivCenterImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="6dp"
+        android:background="@drawable/bg_splash_image_rounded"
+        android:clipToOutline="true"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/img_splash_guide_a"
+        app:layout_constraintBottom_toBottomOf="@id/cardBg"
+        app:layout_constraintEnd_toEndOf="@id/cardBg"
+        app:layout_constraintStart_toStartOf="@id/cardBg"
+        app:layout_constraintTop_toTopOf="@id/cardBg"
+        tools:ignore="ContentDescription" />
+
+    <!-- Top-left clap hands icon (overlapping card) -->
+    <ImageView
+        android:id="@+id/ivClapIcon"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:layout_marginTop="10dp"
+        android:scaleType="fitCenter"
+        android:src="@mipmap/img_splash_guide_clap_tag"
+        android:layout_marginStart="-42.5dp"
+        app:layout_constraintStart_toStartOf="@id/ivCenterImage"
+        app:layout_constraintTop_toTopOf="@id/cardBg"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/ivHappyIcon"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:layout_marginTop="10dp"
+        android:scaleType="fitCenter"
+        android:src="@mipmap/img_splash_guide_happy_tag"
+        android:layout_marginEnd="-42.5dp"
+        android:layout_marginBottom="100dp"
+        app:layout_constraintEnd_toEndOf="@id/ivCenterImage"
+        app:layout_constraintBottom_toBottomOf="@id/cardBg"
+        tools:ignore="ContentDescription" />
+
+    <!-- Get Started button -->
+    <TextView
+        android:id="@+id/btnGetStarted"
+        android:layout_width="0dp"
+        android:layout_height="58dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_splash_button"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="@string/splash_get_started"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/layoutFooter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guidelineButton"
+        android:layout_marginBottom="20dp"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.828" />
+
+    <!-- Footer: Privacy Policy | Terms of Service -->
+    <LinearLayout
+        android:id="@+id/layoutFooter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="46dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/tvPrivacyPolicy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/splash_privacy_policy"
+            android:textColor="#666666"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:background="#666666" />
+
+        <TextView
+            android:id="@+id/tvTermsOfService"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/splash_terms_of_service"
+            android:textColor="#666666"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
