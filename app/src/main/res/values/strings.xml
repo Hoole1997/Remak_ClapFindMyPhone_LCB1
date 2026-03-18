@@ -29,6 +29,13 @@
     <string name="rate_dialog_submit">Submit</string>
     <string name="rate_dialog_later">Later</string>
 
+    <string name="mic_dialog_title">Your Mic, Used Only  When Needed</string>
+    <string name="mic_dialog_desc">Our app listens only for claps or whistles when you\'re not using your phone, safeguarding your privacy and conserving battery life.</string>
+    <string name="mic_dialog_desc_highlight1">not using your phone,</string>
+    <string name="mic_dialog_desc_bold1">safeguarding your privacy</string>
+    <string name="mic_dialog_desc_bold2">conserving battery life.</string>
+    <string name="mic_dialog_got_it">Got it</string>
+
     <string name="guide_intro_line1">Tap the <font color="#FFEC17">switch</font> to turn on phone\ntracking.</string>
     <string name="guide_intro_line2">When tracking is <font color="#FFEC17">ON</font>, you\'ll be able\nto find your phone by clapping or\nwhistling.</string>
 </resources>

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.mobile.clap.dev.R
+import com.mobile.clap.dev.ui.dialog.MicPermissionDialog
 import com.mobile.clap.dev.ui.dialog.RateDialog
 
 class DebugActivity : AppCompatActivity() {
@@ -21,6 +22,17 @@ class DebugActivity : AppCompatActivity() {
                     // dismissed
                 }
                 .show(supportFragmentManager, RateDialog.TAG)
+        }
+
+        findViewById<TextView>(R.id.btnShowMicPermissionDialog).setOnClickListener {
+            MicPermissionDialog.newInstance()
+                .setOnGotItListener {
+                    android.widget.Toast.makeText(this, "Got it clicked", android.widget.Toast.LENGTH_SHORT).show()
+                }
+                .setOnCancelListener {
+                    // dismissed
+                }
+                .show(supportFragmentManager, MicPermissionDialog.TAG)
         }
     }
 }
