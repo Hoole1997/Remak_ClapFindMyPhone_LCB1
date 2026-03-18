@@ -26,6 +26,9 @@
         <activity
             android:name=".ui.activity.AlertSoundActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.activity.DebugActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

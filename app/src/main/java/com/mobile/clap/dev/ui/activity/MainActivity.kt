@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.mobile.clap.dev.BuildConfig
 import com.mobile.clap.dev.R
 
 class MainActivity : AppCompatActivity() {
@@ -256,6 +257,13 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.itemAlertDuration).setOnClickListener {
             // TODO: Open alert duration picker
+        }
+
+        if (BuildConfig.DEBUG) {
+            findViewById<TextView>(R.id.tvAppName).setOnLongClickListener {
+                startActivity(android.content.Intent(this, DebugActivity::class.java))
+                true
+            }
         }
     }
 }
