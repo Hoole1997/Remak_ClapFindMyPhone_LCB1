@@ -19,7 +19,9 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.mobile.clap.dev.BuildConfig
 import com.mobile.clap.dev.R
+import com.mobile.clap.dev.ui.dialog.AlertDurationSettingDialog
 import com.remax.base.ext.KvBoolDelegate
+import com.remax.base.ext.KvIntDelegate
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toggleThumb: FrameLayout
     private lateinit var tvToggleLabel: TextView
 
+    private lateinit var tvAlertDurationValue: TextView
+
     private lateinit var switchClap: MaterialSwitch
     private lateinit var switchWhistle: MaterialSwitch
     private lateinit var switchSound: MaterialSwitch
@@ -39,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var switchFlashlight: MaterialSwitch
 
     private var guideShown by KvBoolDelegate("home_guide_shown", false)
+    private var alertDuration by KvIntDelegate("alert_duration", 10)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,6 +114,8 @@ class MainActivity : AppCompatActivity() {
         switchSound = findViewById(R.id.switchSound)
         switchVibration = findViewById(R.id.switchVibration)
         switchFlashlight = findViewById(R.id.switchFlashlight)
+        tvAlertDurationValue = findViewById(R.id.tvAlertDurationValue)
+        updateAlertDurationDisplay()
     }
 
     private fun setupMainToggle() {
@@ -261,9 +268,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.itemAlertDuration).setOnClickListener {
-            // TODO: Open alert duration picker
+            AlertDurationSettingDialog.newInstance()
+                .setSelectedDuration(alertDuration)
+                .setOnConfirmListener { duration ->
+                    alertDuration = duration
+                    updateAlertDurationDisplay()
+                }
+                .show(supportFragmentManager, AlertDurationSettingDialog.TAG)
         }
 
+    }
+
+    private fun updateAlertDurationDisplay() {
+        tvAlertDurationValue.text = getString(R.string.alert_duration_seconds, alertDuration)
     }
 
     private fun checkAutoOffMainToggle() {
