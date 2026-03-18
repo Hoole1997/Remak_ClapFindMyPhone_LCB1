@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.mobile.clap.dev.R
+import com.mobile.clap.dev.ui.dialog.AlertDurationSettingDialog
 import com.mobile.clap.dev.ui.dialog.MicPermissionDialog
 import com.mobile.clap.dev.ui.dialog.RateDialog
 import com.mobile.clap.dev.ui.dialog.TestMicDialog
@@ -45,6 +46,18 @@ class DebugActivity : AppCompatActivity() {
                     // dismissed
                 }
                 .show(supportFragmentManager, TestMicDialog.TAG)
+        }
+
+        findViewById<TextView>(R.id.btnShowAlertDurationDialog).setOnClickListener {
+            AlertDurationSettingDialog.newInstance()
+                .setSelectedDuration(30)
+                .setOnConfirmListener { duration ->
+                    android.widget.Toast.makeText(this, "Selected: ${duration} sec", android.widget.Toast.LENGTH_SHORT).show()
+                }
+                .setOnCancelListener {
+                    // dismissed
+                }
+                .show(supportFragmentManager, AlertDurationSettingDialog.TAG)
         }
     }
 }

@@ -35,6 +35,14 @@
     <string name="test_mic_dialog_desc_dark">or whistle</string>
     <string name="test_mic_dialog_later">I\'ll test it later</string>
 
+    <string name="alert_duration_dialog_title">ALERT DURATION</string>
+    <string name="alert_duration_10_sec">10 sec</string>
+    <string name="alert_duration_30_sec">30 sec</string>
+    <string name="alert_duration_60_sec">60 sec</string>
+    <string name="alert_duration_120_sec">120 sec</string>
+    <string name="alert_duration_ok">Ok</string>
+    <string name="alert_duration_cancel">Cancel</string>
+
     <string name="mic_dialog_title">Your Mic, Used Only  When Needed</string>
     <string name="mic_dialog_desc">Our app listens only for claps or whistles when you\'re not using your phone, safeguarding your privacy and conserving battery life.</string>
     <string name="mic_dialog_desc_highlight1">not using your phone,</string>

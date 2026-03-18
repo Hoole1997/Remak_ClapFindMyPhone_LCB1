@@ -52,4 +52,16 @@
         android:textColor="@android:color/white"
         android:textSize="16sp" />
 
+    <TextView
+        android:id="@+id/btnShowAlertDurationDialog"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_rate_submit_button"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="Show Alert Duration Dialog"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+
 </LinearLayout>
