@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.mobile.clap.dev.R
 import com.mobile.clap.dev.ui.dialog.MicPermissionDialog
 import com.mobile.clap.dev.ui.dialog.RateDialog
+import com.mobile.clap.dev.ui.dialog.TestMicDialog
 
 class DebugActivity : AppCompatActivity() {
 
@@ -33,6 +34,17 @@ class DebugActivity : AppCompatActivity() {
                     // dismissed
                 }
                 .show(supportFragmentManager, MicPermissionDialog.TAG)
+        }
+
+        findViewById<TextView>(R.id.btnShowTestMicDialog).setOnClickListener {
+            TestMicDialog.newInstance()
+                .setOnLaterListener {
+                    android.widget.Toast.makeText(this, "Test later clicked", android.widget.Toast.LENGTH_SHORT).show()
+                }
+                .setOnCancelListener {
+                    // dismissed
+                }
+                .show(supportFragmentManager, TestMicDialog.TAG)
         }
     }
 }
