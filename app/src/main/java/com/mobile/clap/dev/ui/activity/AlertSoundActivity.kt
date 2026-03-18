@@ -129,6 +129,7 @@ class AlertSoundActivity : AppCompatActivity() {
             val flSoundIconContainer: FrameLayout = itemView.findViewById(R.id.flSoundIconContainer)
             val ivSoundIcon: ImageView = itemView.findViewById(R.id.ivSoundIcon)
             val ivHotTag: ImageView = itemView.findViewById(R.id.ivHotTag)
+            val tvAdTag: TextView = itemView.findViewById(R.id.tvAdTag)
             val tvSoundName: TextView = itemView.findViewById(R.id.tvSoundName)
         }
 
@@ -146,11 +147,16 @@ class AlertSoundActivity : AppCompatActivity() {
 
             // Show/hide badges
             holder.ivHotTag.visibility = if (item.hasHot) View.VISIBLE else View.GONE
+            holder.tvAdTag.visibility = if (item.hasAd) View.VISIBLE else View.GONE
 
             // Selected state
             val isSelected = position == selectedSoundIndex
             holder.flSoundIconContainer.setBackgroundResource(
-                if (isSelected) R.drawable.bg_sound_item_selected_ring else 0
+                when {
+                    isSelected -> R.drawable.bg_sound_item_selected_ring
+                    item.hasHot -> R.drawable.bg_sound_item_hot_ring
+                    else -> 0
+                }
             )
             holder.tvSoundName.setTextColor(
                 ContextCompat.getColor(

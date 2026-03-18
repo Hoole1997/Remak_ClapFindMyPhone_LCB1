@@ -11,18 +11,42 @@
         android:layout_height="62dp"
         android:padding="3dp">
 
-        <ImageView
-            android:id="@+id/ivSoundIcon"
+        <FrameLayout
+            android:id="@+id/flSoundIconClip"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:importantForAccessibility="no"
-            android:scaleType="fitCenter" />
+            android:background="@drawable/bg_circle_clip"
+            android:clipToOutline="true">
+
+            <ImageView
+                android:id="@+id/ivSoundIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:id="@+id/tvAdTag"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_gravity="bottom"
+                android:background="#D93B85FC"
+                android:gravity="center"
+                android:text="AD"
+                android:textColor="@android:color/white"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </FrameLayout>
 
         <ImageView
             android:id="@+id/ivHotTag"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="top|start"
+            android:layout_marginStart="-2dp"
+            android:layout_marginTop="-2dp"
             android:importantForAccessibility="no"
             android:src="@mipmap/img_clap_alarm_setting_hot_tag"
             android:scaleType="centerInside"
