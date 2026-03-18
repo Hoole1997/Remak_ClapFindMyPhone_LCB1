@@ -1,7 +1,6 @@
 package com.mobile.clap.dev.ui.activity
 
 import android.animation.ObjectAnimator
-import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.RenderEffect
@@ -20,10 +19,12 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.mobile.clap.dev.BuildConfig
 import com.mobile.clap.dev.R
+import com.remax.base.ext.KvBoolDelegate
 
 class MainActivity : AppCompatActivity() {
 
-    private var isDetectionOn = true
+    private var isDetectionOn = false
+    private var isUpdatingFromCode = false
 
     private lateinit var tvDetectionStatus: TextView
     private lateinit var toggleMainContainer: FrameLayout
@@ -37,10 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var switchVibration: MaterialSwitch
     private lateinit var switchFlashlight: MaterialSwitch
 
-    companion object {
-        private const val PREF_NAME = "home_guide_prefs"
-        private const val KEY_GUIDE_SHOWN = "guide_shown"
-    }
+    private var guideShown by KvBoolDelegate("home_guide_shown", false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,13 +50,13 @@ class MainActivity : AppCompatActivity() {
         setupMainToggle()
         styleSwitches()
         setupListeners()
+        setupDebugEntry()
         updateToggleUI(isDetectionOn, animate = false)
         showGuideIfFirstLaunch()
     }
 
     private fun showGuideIfFirstLaunch() {
-        val prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        if (prefs.getBoolean(KEY_GUIDE_SHOWN, false)) return
+        if (guideShown) return
 
         val rootView = findViewById<FrameLayout>(R.id.main)
 
@@ -85,8 +83,7 @@ class MainActivity : AppCompatActivity() {
                     rootView.getChildAt(i).setRenderEffect(null)
                 }
             }
-            // Mark guide as shown
-            prefs.edit().putBoolean(KEY_GUIDE_SHOWN, true).apply()
+            guideShown = true
         }
     }
 
@@ -118,6 +115,12 @@ class MainActivity : AppCompatActivity() {
         toggleMainContainer.setOnClickListener {
             isDetectionOn = !isDetectionOn
             updateToggleUI(isDetectionOn, animate = true)
+            if (isDetectionOn) {
+                isUpdatingFromCode = true
+                switchClap.isChecked = true
+                switchWhistle.isChecked = true
+                isUpdatingFromCode = false
+            }
         }
     }
 
@@ -233,10 +236,12 @@ class MainActivity : AppCompatActivity() {
     private fun setupListeners() {
         switchClap.setOnCheckedChangeListener { _, isChecked ->
             // TODO: Handle clap detection toggle
+            if (!isUpdatingFromCode) checkAutoOffMainToggle()
         }
 
         switchWhistle.setOnCheckedChangeListener { _, isChecked ->
             // TODO: Handle whistle detection toggle
+            if (!isUpdatingFromCode) checkAutoOffMainToggle()
         }
 
         switchSound.setOnCheckedChangeListener { _, isChecked ->
@@ -259,6 +264,16 @@ class MainActivity : AppCompatActivity() {
             // TODO: Open alert duration picker
         }
 
+    }
+
+    private fun checkAutoOffMainToggle() {
+        if (!switchClap.isChecked && !switchWhistle.isChecked && isDetectionOn) {
+            isDetectionOn = false
+            updateToggleUI(isDetectionOn, animate = true)
+        }
+    }
+
+    private fun setupDebugEntry() {
         if (BuildConfig.DEBUG) {
             findViewById<TextView>(R.id.tvAppName).setOnLongClickListener {
                 startActivity(android.content.Intent(this, DebugActivity::class.java))

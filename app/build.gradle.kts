@@ -139,6 +139,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":analytics"))
+    implementation(project(":base"))
     implementation("com.github.toukaremax:core:1.0.9")
     implementation("com.github.toukaremax:bill:1.0.10")
 

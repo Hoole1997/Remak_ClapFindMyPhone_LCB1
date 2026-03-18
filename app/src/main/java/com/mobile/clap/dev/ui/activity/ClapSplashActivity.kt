@@ -9,11 +9,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.mobile.clap.dev.R
+import com.remax.base.ext.KvBoolDelegate
 
 class ClapSplashActivity : AppCompatActivity() {
 
+    private var splashShown by KvBoolDelegate("splash_shown", false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (splashShown) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_clap_splash)
 
@@ -32,6 +42,7 @@ class ClapSplashActivity : AppCompatActivity() {
         val tvTermsOfService = findViewById<TextView>(R.id.tvTermsOfService)
 
         btnGetStarted.setOnClickListener {
+            splashShown = true
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
