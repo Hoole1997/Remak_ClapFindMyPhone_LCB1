@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".ui.activity.DebugActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-bold"
+        android:text="Debug Panel"
+        android:textColor="@color/text_dark"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/btnShowRateDialog"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_rate_submit_button"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="Show Rate Dialog"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+
+</LinearLayout>

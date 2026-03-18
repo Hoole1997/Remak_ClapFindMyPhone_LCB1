@@ -24,6 +24,11 @@
     <string name="setting_tap_to_play_sound">Tap to play Sound</string>
     <string name="setting_save">Save</string>
 
+    <string name="rate_dialog_title">Do you like %s?</string>
+    <string name="rate_dialog_subtitle">Rate your experience</string>
+    <string name="rate_dialog_submit">Submit</string>
+    <string name="rate_dialog_later">Later</string>
+
     <string name="guide_intro_line1">Tap the <font color="#FFEC17">switch</font> to turn on phone\ntracking.</string>
     <string name="guide_intro_line2">When tracking is <font color="#FFEC17">ON</font>, you\'ll be able\nto find your phone by clapping or\nwhistling.</string>
 </resources>
