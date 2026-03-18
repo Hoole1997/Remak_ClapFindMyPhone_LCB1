@@ -16,3 +16,4 @@ local.properties
 build.config.properties
 /.idea
 /.kotlin
+/clap

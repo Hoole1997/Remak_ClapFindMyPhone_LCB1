@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    id("kotlin-parcelize")
 }
 
 val configSetting = findProperty("setting") as Map<*, *>
@@ -130,6 +131,11 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    // Don't compress tflite model files
+    aaptOptions {
+        noCompress("tflite")
+    }
 }
 
 dependencies {
@@ -141,6 +147,14 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
+    // MediaPipe Tasks Audio for ML audio classification
+    implementation("com.google.mediapipe:tasks-audio:0.10.26")
+
+    // Kotlin Coroutines
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
