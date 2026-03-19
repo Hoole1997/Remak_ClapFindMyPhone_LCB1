@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvToggleLabel: TextView
 
     private lateinit var tvAlertDurationValue: TextView
+    private lateinit var tvAlertSoundValue: TextView
 
     private lateinit var switchClap: MaterialSwitch
     private lateinit var switchWhistle: MaterialSwitch
@@ -44,6 +45,13 @@ class MainActivity : AppCompatActivity() {
 
     private var guideShown by KvBoolDelegate("home_guide_shown", false)
     private var alertDuration by KvIntDelegate("alert_duration", 10)
+    private var alertSoundIndex by KvIntDelegate("alert_sound_index", 3)
+
+    private var clapEnabled by KvBoolDelegate("switch_clap", true)
+    private var whistleEnabled by KvBoolDelegate("switch_whistle", true)
+    private var soundEnabled by KvBoolDelegate("switch_sound", true)
+    private var vibrationEnabled by KvBoolDelegate("switch_vibration", true)
+    private var flashlightEnabled by KvBoolDelegate("switch_flashlight", true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,7 +123,15 @@ class MainActivity : AppCompatActivity() {
         switchVibration = findViewById(R.id.switchVibration)
         switchFlashlight = findViewById(R.id.switchFlashlight)
         tvAlertDurationValue = findViewById(R.id.tvAlertDurationValue)
+        tvAlertSoundValue = findViewById(R.id.tvAlertSoundValue)
         updateAlertDurationDisplay()
+        updateAlertSoundDisplay()
+
+        switchClap.isChecked = clapEnabled
+        switchWhistle.isChecked = whistleEnabled
+        switchSound.isChecked = soundEnabled
+        switchVibration.isChecked = vibrationEnabled
+        switchFlashlight.isChecked = flashlightEnabled
     }
 
     private fun setupMainToggle() {
@@ -242,24 +258,29 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         switchClap.setOnCheckedChangeListener { _, isChecked ->
+            clapEnabled = isChecked
             // TODO: Handle clap detection toggle
             if (!isUpdatingFromCode) checkAutoOffMainToggle()
         }
 
         switchWhistle.setOnCheckedChangeListener { _, isChecked ->
+            whistleEnabled = isChecked
             // TODO: Handle whistle detection toggle
             if (!isUpdatingFromCode) checkAutoOffMainToggle()
         }
 
         switchSound.setOnCheckedChangeListener { _, isChecked ->
+            soundEnabled = isChecked
             // TODO: Handle sound toggle
         }
 
         switchVibration.setOnCheckedChangeListener { _, isChecked ->
+            vibrationEnabled = isChecked
             // TODO: Handle vibration toggle
         }
 
         switchFlashlight.setOnCheckedChangeListener { _, isChecked ->
+            flashlightEnabled = isChecked
             // TODO: Handle flashlight toggle
         }
 
@@ -279,8 +300,17 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private val soundNames = listOf(
+        "LABUBU", "APT", "Music", "Cat", "Dog", "Alarm",
+        "Hello", "Whistle", "Gunshot", "Piano", "Train", "Warning"
+    )
+
     private fun updateAlertDurationDisplay() {
         tvAlertDurationValue.text = getString(R.string.alert_duration_seconds, alertDuration)
+    }
+
+    private fun updateAlertSoundDisplay() {
+        tvAlertSoundValue.text = soundNames.getOrElse(alertSoundIndex) { "Cat" }
     }
 
     private fun checkAutoOffMainToggle() {
@@ -288,6 +318,11 @@ class MainActivity : AppCompatActivity() {
             isDetectionOn = false
             updateToggleUI(isDetectionOn, animate = true)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateAlertSoundDisplay()
     }
 
     private fun setupDebugEntry() {

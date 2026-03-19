@@ -1,6 +1,8 @@
 package com.mobile.clap.dev.ui.activity
 
 import android.graphics.Rect
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mobile.clap.dev.R
+import com.remax.base.ext.KvIntDelegate
 
 class AlertSoundActivity : AppCompatActivity() {
 
@@ -25,27 +28,40 @@ class AlertSoundActivity : AppCompatActivity() {
     private lateinit var rvSounds: RecyclerView
     private lateinit var btnSave: TextView
 
-    private var selectedSoundIndex = 3 // Cat selected by default
+    private lateinit var audioMgr: AudioManager
+    private var previewPlayer: MediaPlayer? = null
+
+    private var savedSoundIndex by KvIntDelegate("alert_sound_index", 3)
+    private var savedVolume by KvIntDelegate("alert_volume", -1)
+
+    private var selectedSoundIndex = 3
+    private var currentVolume = 0
 
     private val soundItems = listOf(
-        SoundItem("LABUBU", R.mipmap.img_setting_labubu, hasHot = true, hasAd = true),
-        SoundItem("APT", R.mipmap.img_setting_apt, hasAd = true),
-        SoundItem("Music", R.mipmap.img_setting_music, hasAd = true),
-        SoundItem("Cat", R.mipmap.img_setting_cat),
-        SoundItem("Dog", R.mipmap.img_setting_dog),
-        SoundItem("Alarm", R.mipmap.img_setting_alarm),
-        SoundItem("Hello", R.mipmap.img_setting_hello),
-        SoundItem("Whistle", R.mipmap.img_setting_whistle),
-        SoundItem("Gunshot", R.mipmap.img_setting_gunshot),
-        SoundItem("Piano", R.mipmap.img_setting_piano),
-        SoundItem("Train", R.mipmap.img_setting_train),
-        SoundItem("Warning", R.mipmap.img_setting_warning)
+        SoundItem("LABUBU", R.mipmap.img_setting_labubu, R.raw.alert_labubu, hasHot = true, hasAd = true),
+        SoundItem("APT", R.mipmap.img_setting_apt, R.raw.alert_apt, hasAd = true),
+        SoundItem("Music", R.mipmap.img_setting_music, R.raw.alert_music, hasAd = true),
+        SoundItem("Cat", R.mipmap.img_setting_cat, R.raw.alert_cat),
+        SoundItem("Dog", R.mipmap.img_setting_dog, R.raw.alert_dog),
+        SoundItem("Alarm", R.mipmap.img_setting_alarm, R.raw.alert_alarm),
+        SoundItem("Hello", R.mipmap.img_setting_hello, R.raw.alert_bell),
+        SoundItem("Whistle", R.mipmap.img_setting_whistle, R.raw.alert_whistle),
+        SoundItem("Gunshot", R.mipmap.img_setting_gunshot, R.raw.alert_gunshot),
+        SoundItem("Piano", R.mipmap.img_setting_piano, R.raw.alert_piano),
+        SoundItem("Train", R.mipmap.img_setting_train, R.raw.alert_train),
+        SoundItem("Warning", R.mipmap.img_setting_warning, R.raw.alert_waring)
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_alert_sound)
+
+        audioMgr = getSystemService(AUDIO_SERVICE) as AudioManager
+
+        selectedSoundIndex = savedSoundIndex
+        val maxVol = audioMgr.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        currentVolume = if (savedVolume < 0) audioMgr.getStreamVolume(AudioManager.STREAM_MUSIC) else savedVolume.coerceIn(0, maxVol)
 
         setupEdgeToEdge()
         initViews()
@@ -72,15 +88,27 @@ class AlertSoundActivity : AppCompatActivity() {
     }
 
     private fun setupVolumeSeekBar() {
-        tvVolumePercent.text = "${seekBarVolume.progress}%"
+        val maxVol = audioMgr.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        seekBarVolume.max = maxVol
+        seekBarVolume.progress = currentVolume
+        updateVolumePercent(currentVolume, maxVol)
+
         seekBarVolume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                tvVolumePercent.text = "$progress%"
+                currentVolume = progress
+                updateVolumePercent(progress, maxVol)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                playPreviewSound(soundItems[selectedSoundIndex].rawResId)
+            }
         })
+    }
+
+    private fun updateVolumePercent(volume: Int, maxVolume: Int) {
+        val percent = (volume * 100f / maxVolume).toInt()
+        tvVolumePercent.text = "$percent%"
     }
 
     private fun setupSoundGrid() {
@@ -111,7 +139,8 @@ class AlertSoundActivity : AppCompatActivity() {
         }
 
         btnSave.setOnClickListener {
-            // TODO: Save selected sound and volume
+            savedSoundIndex = selectedSoundIndex
+            savedVolume = currentVolume
             finish()
         }
     }
@@ -119,6 +148,7 @@ class AlertSoundActivity : AppCompatActivity() {
     data class SoundItem(
         val name: String,
         val iconRes: Int,
+        val rawResId: Int,
         val hasHot: Boolean = false,
         val hasAd: Boolean = false
     )
@@ -170,10 +200,40 @@ class AlertSoundActivity : AppCompatActivity() {
                 selectedSoundIndex = holder.bindingAdapterPosition
                 notifyItemChanged(previousSelected)
                 notifyItemChanged(selectedSoundIndex)
-                // TODO: Play sound preview
+                playPreviewSound(soundItems[selectedSoundIndex].rawResId)
             }
         }
 
         override fun getItemCount(): Int = soundItems.size
+    }
+
+    private fun playPreviewSound(resId: Int) {
+        stopPreviewSound()
+        try {
+            audioMgr.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
+            previewPlayer = MediaPlayer.create(this, resId)?.apply {
+                setOnCompletionListener { release() }
+                start()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun stopPreviewSound() {
+        try {
+            previewPlayer?.let {
+                if (it.isPlaying) it.stop()
+                it.release()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        previewPlayer = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopPreviewSound()
     }
 }
