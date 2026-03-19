@@ -32,6 +32,8 @@ class MlSoundDetector(
 
     private var audioRecord: AudioRecord? = null
     private var isDetecting = false
+    @Volatile
+    private var isPaused = false
     private var detectionJob: Job? = null
     
     // ML 分类器
@@ -133,6 +135,7 @@ class MlSoundDetector(
     private var lastLogTime = 0L
     
     private fun processAudioData(buffer: ShortArray, size: Int) {
+        if (isPaused) return
         val classifier = mlClassifier ?: return
         
         // 累积音频样本
@@ -225,6 +228,24 @@ class MlSoundDetector(
      * 是否正在检测
      */
     fun isDetecting(): Boolean = isDetecting
+
+    /**
+     * 暂停检测（不停止录音，仅跳过分类处理）
+     */
+    fun pauseDetection() {
+        isPaused = true
+        accumulatedCount = 0
+        detectionTimestamps.clear()
+        Log.d(TAG, "Detection paused")
+    }
+
+    /**
+     * 恢复检测
+     */
+    fun resumeDetection() {
+        isPaused = false
+        Log.d(TAG, "Detection resumed")
+    }
 
     /**
      * 更新配置

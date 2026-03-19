@@ -1,29 +1,44 @@
 package com.mobile.clap.dev.ui.activity
 
+import android.Manifest
 import android.animation.ObjectAnimator
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.RenderEffect
 import android.graphics.Shader
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.mobile.clap.dev.BuildConfig
 import com.mobile.clap.dev.R
+import com.mobile.clap.dev.ml.AlertSoundResources
+import com.mobile.clap.dev.ml.AudioDetectionConfig
+import com.mobile.clap.dev.service.AudioDetectionService
 import com.mobile.clap.dev.ui.dialog.AlertDurationSettingDialog
+import com.mobile.clap.dev.ui.dialog.MicPermissionDialog
+import com.mobile.clap.dev.ui.dialog.TestMicDialog
 import com.remax.base.ext.KvBoolDelegate
 import com.remax.base.ext.KvIntDelegate
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "MainActivity"
+    }
 
     private var isDetectionOn = false
     private var isUpdatingFromCode = false
@@ -46,12 +61,38 @@ class MainActivity : AppCompatActivity() {
     private var guideShown by KvBoolDelegate("home_guide_shown", false)
     private var alertDuration by KvIntDelegate("alert_duration", 10)
     private var alertSoundIndex by KvIntDelegate("alert_sound_index", 3)
+    private var alertVolumeSaved by KvIntDelegate("alert_volume", -1)
 
     private var clapEnabled by KvBoolDelegate("switch_clap", true)
     private var whistleEnabled by KvBoolDelegate("switch_whistle", true)
     private var soundEnabled by KvBoolDelegate("switch_sound", true)
     private var vibrationEnabled by KvBoolDelegate("switch_vibration", true)
     private var flashlightEnabled by KvBoolDelegate("switch_flashlight", true)
+    private var micTestShown by KvBoolDelegate("mic_test_shown", false)
+    private var pendingMicPermissionRequest = false
+
+    private val requestPermissionsLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+            val allGranted = results.values.all { it }
+            if (allGranted) {
+                enableDetection()
+                if (pendingMicPermissionRequest && !micTestShown) {
+                    micTestShown = true
+                    TestMicDialog.newInstance()
+                        .show(supportFragmentManager, TestMicDialog.TAG)
+                }
+                pendingMicPermissionRequest = false
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show()
+                isDetectionOn = false
+                updateToggleUI(false, animate = true)
+                // 授权失败，将 Clap/Whistle 开关回退到 OFF
+                isUpdatingFromCode = true
+                switchClap.isChecked = false
+                switchWhistle.isChecked = false
+                isUpdatingFromCode = false
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -136,13 +177,132 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupMainToggle() {
         toggleMainContainer.setOnClickListener {
-            isDetectionOn = !isDetectionOn
-            updateToggleUI(isDetectionOn, animate = true)
             if (isDetectionOn) {
-                isUpdatingFromCode = true
-                switchClap.isChecked = true
-                switchWhistle.isChecked = true
-                isUpdatingFromCode = false
+                // 关闭检测
+                disableDetection()
+            } else {
+                // 开启检测 - 先检查权限
+                checkPermissionAndEnable()
+            }
+        }
+    }
+
+    // ==================== 权限 & 检测控制 ====================
+
+    private fun hasAudioPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) ==
+                PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun checkPermissionAndEnable() {
+        val permissionsToRequest = mutableListOf<String>()
+
+        if (!hasAudioPermission()) {
+            permissionsToRequest.add(Manifest.permission.RECORD_AUDIO)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
+        if (permissionsToRequest.isEmpty()) {
+            enableDetection()
+        } else {
+            pendingMicPermissionRequest = !hasAudioPermission()
+            MicPermissionDialog.newInstance()
+                .setOnGotItListener {
+                    requestPermissionsLauncher.launch(permissionsToRequest.toTypedArray())
+                }
+                .setOnCancelListener {
+                    // 用户取消，不做任何事
+                }
+                .show(supportFragmentManager, MicPermissionDialog.TAG)
+        }
+    }
+
+    private fun enableDetection() {
+        isDetectionOn = true
+        updateToggleUI(true, animate = true)
+
+        // 总开关开启时，同时开启 Clap 和 Whistle（仅当两个都关闭时）
+        if (!switchClap.isChecked && !switchWhistle.isChecked) {
+            isUpdatingFromCode = true
+            switchClap.isChecked = true
+            switchWhistle.isChecked = true
+            clapEnabled = true
+            whistleEnabled = true
+            isUpdatingFromCode = false
+        }
+
+        // 启动前台检测服务（config 直接随 START intent 传递，避免竞态）
+        val config = buildDetectionConfig()
+        Log.d(TAG, "Detection enabled, config: clap=${config.handclapEnabled}, whistle=${config.whistleEnabled}, alertVol=${config.alertVolume}, soundIdx=${config.alertSoundIndex}")
+        AudioDetectionService.start(this, config)
+    }
+
+    private fun disableDetection() {
+        isDetectionOn = false
+        updateToggleUI(false, animate = true)
+
+        // 总开关关闭时，同时关闭 Clap 和 Whistle
+        isUpdatingFromCode = true
+        switchClap.isChecked = false
+        switchWhistle.isChecked = false
+        clapEnabled = false
+        whistleEnabled = false
+        isUpdatingFromCode = false
+
+        // 停止前台检测服务
+        AudioDetectionService.stop(this)
+        Log.d(TAG, "Detection disabled, service stopped")
+    }
+
+    private fun buildDetectionConfig(): AudioDetectionConfig {
+        return AudioDetectionConfig(
+            handclapEnabled = clapEnabled && isDetectionOn,
+            whistleEnabled = whistleEnabled && isDetectionOn,
+            alertDurationSeconds = alertDuration,
+            alertSoundIndex = alertSoundIndex,
+            vibrationEnabled = vibrationEnabled,
+            flashlightEnabled = flashlightEnabled,
+            alertVolume = if (soundEnabled) {
+                val audioManager = getSystemService(AUDIO_SERVICE) as android.media.AudioManager
+                val maxVol = audioManager.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
+                if (alertVolumeSaved < 0) maxVol else alertVolumeSaved.coerceIn(1, maxVol)
+            } else 0
+        )
+    }
+
+    private fun updateServiceConfig() {
+        if (!isDetectionOn) return
+        val config = buildDetectionConfig()
+        AudioDetectionService.updateConfig(this, config)
+        Log.d(TAG, "Config updated: clap=${config.handclapEnabled}, whistle=${config.whistleEnabled}")
+    }
+
+    /**
+     * 根据 Clap/Whistle 开关状态同步总开关
+     */
+    private fun syncMainToggleWithDetectionSwitches(switchTurnedOn: Boolean) {
+        if (switchTurnedOn) {
+            // 任一开关打开时，如果总开关是关的，则开启总开关
+            if (!isDetectionOn) {
+                checkPermissionAndEnable()
+            } else {
+                updateServiceConfig()
+            }
+        } else {
+            // 两个都关闭时，关闭总开关
+            if (!switchClap.isChecked && !switchWhistle.isChecked) {
+                if (isDetectionOn) {
+                    disableDetection()
+                }
+            } else {
+                updateServiceConfig()
             }
         }
     }
@@ -259,29 +419,27 @@ class MainActivity : AppCompatActivity() {
     private fun setupListeners() {
         switchClap.setOnCheckedChangeListener { _, isChecked ->
             clapEnabled = isChecked
-            // TODO: Handle clap detection toggle
-            if (!isUpdatingFromCode) checkAutoOffMainToggle()
+            if (!isUpdatingFromCode) syncMainToggleWithDetectionSwitches(isChecked)
         }
 
         switchWhistle.setOnCheckedChangeListener { _, isChecked ->
             whistleEnabled = isChecked
-            // TODO: Handle whistle detection toggle
-            if (!isUpdatingFromCode) checkAutoOffMainToggle()
+            if (!isUpdatingFromCode) syncMainToggleWithDetectionSwitches(isChecked)
         }
 
         switchSound.setOnCheckedChangeListener { _, isChecked ->
             soundEnabled = isChecked
-            // TODO: Handle sound toggle
+            updateServiceConfig()
         }
 
         switchVibration.setOnCheckedChangeListener { _, isChecked ->
             vibrationEnabled = isChecked
-            // TODO: Handle vibration toggle
+            updateServiceConfig()
         }
 
         switchFlashlight.setOnCheckedChangeListener { _, isChecked ->
             flashlightEnabled = isChecked
-            // TODO: Handle flashlight toggle
+            updateServiceConfig()
         }
 
         findViewById<View>(R.id.itemAlertSound).setOnClickListener {
@@ -300,29 +458,19 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private val soundNames = listOf(
-        "LABUBU", "APT", "Music", "Cat", "Dog", "Alarm",
-        "Hello", "Whistle", "Gunshot", "Piano", "Train", "Warning"
-    )
-
     private fun updateAlertDurationDisplay() {
         tvAlertDurationValue.text = getString(R.string.alert_duration_seconds, alertDuration)
     }
 
     private fun updateAlertSoundDisplay() {
-        tvAlertSoundValue.text = soundNames.getOrElse(alertSoundIndex) { "Cat" }
-    }
-
-    private fun checkAutoOffMainToggle() {
-        if (!switchClap.isChecked && !switchWhistle.isChecked && isDetectionOn) {
-            isDetectionOn = false
-            updateToggleUI(isDetectionOn, animate = true)
-        }
+        tvAlertSoundValue.text = AlertSoundResources.getDisplayName(alertSoundIndex)
     }
 
     override fun onResume() {
         super.onResume()
         updateAlertSoundDisplay()
+        // 从 AlertSoundActivity 返回后，将最新配置推送给服务
+        updateServiceConfig()
     }
 
     private fun setupDebugEntry() {

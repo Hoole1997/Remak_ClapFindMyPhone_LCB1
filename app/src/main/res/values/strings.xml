@@ -53,4 +53,13 @@
 
     <string name="guide_intro_line1">Tap the <font color="#FFEC17">switch</font> to turn on phone\ntracking.</string>
     <string name="guide_intro_line2">When tracking is <font color="#FFEC17">ON</font>, you\'ll be able\nto find your phone by clapping or\nwhistling.</string>
+
+    <string name="notification_channel_name">Sound Detection</string>
+    <string name="notification_channel_desc">Listening for clap and whistle sounds</string>
+    <string name="notification_title">Find My Phone</string>
+    <string name="notification_text">Listening for clap &amp; whistle…</string>
+    <string name="notification_alerting_title">We\'re ready to Find Your Phone!</string>
+    <string name="notification_alerting_disable">Disable Clap &amp; Whistle Detection</string>
+    <string name="notification_alerting_disable_short">Disable</string>
+    <string name="permission_denied">Permission denied</string>
 </resources>

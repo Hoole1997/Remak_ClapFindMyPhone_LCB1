@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mobile.clap.dev.R
+import com.mobile.clap.dev.service.AudioDetectionService
 import com.remax.base.ext.KvIntDelegate
 
 class AlertSoundActivity : AppCompatActivity() {
@@ -230,6 +231,16 @@ class AlertSoundActivity : AppCompatActivity() {
             e.printStackTrace()
         }
         previewPlayer = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        AudioDetectionService.pauseDetection(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        AudioDetectionService.resumeDetection(this)
     }
 
     override fun onDestroy() {

@@ -71,7 +71,7 @@ class DeviceAlertManager(
         if (isRunning) return
         isRunning = true
         
-        Log.d(TAG, "Starting alert...")
+        Log.d(TAG, "Starting alert... alertVolume=${config.alertVolume}, soundIdx=${config.alertSoundIndex}, vibration=${config.vibrationEnabled}, flashlight=${config.flashlightEnabled}")
         
         // 播放铃声（检查声音是否启用）
         if (config.alertVolume > 0) {
@@ -127,23 +127,36 @@ class DeviceAlertManager(
         try {
             // 根据配置选择音效资源
             val soundResId = AlertSoundResources.getAudioResId(config.alertSoundIndex)
-            
-            // 直接使用 alertVolume 作为系统音量级数
+
+            // 使用 STREAM_ALARM 确保后台/勿扰模式下也能播放，按用户设置的音量比例换算
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, config.alertVolume, 0)
-            
-            mediaPlayer = MediaPlayer.create(context, soundResId)?.apply {
-                setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .build()
-                )
+            val maxAlarmVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)
+            val maxMusicVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            val alarmVol = if (maxMusicVol > 0) {
+                ((config.alertVolume.toFloat() / maxMusicVol) * maxAlarmVol).toInt()
+                    .coerceIn(1, maxAlarmVol)
+            } else {
+                maxAlarmVol
+            }
+            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, alarmVol, 0)
+
+            // 必须在 prepare() 之前设置 AudioAttributes，否则会抛 IllegalStateException
+            val attributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+
+            mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(attributes)
+                context.resources.openRawResourceFd(soundResId)?.use { afd ->
+                    setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                }
                 isLooping = true
+                prepare()
                 start()
             }
-            
-            Log.d(TAG, "Alarm playing, sound index: ${config.alertSoundIndex}, volume: ${config.alertVolume}")
+
+            Log.d(TAG, "Alarm playing, sound index: ${config.alertSoundIndex}, volume: $maxAlarmVol")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to play alarm sound", e)
         }
