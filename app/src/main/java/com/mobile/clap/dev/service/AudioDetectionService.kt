@@ -284,7 +284,7 @@ class AudioDetectionService : Service() {
             this,
             1,
             Intent(this, AudioDetectionService::class.java).apply {
-                action = ACTION_STOP
+                action = ACTION_STOP_ALERT
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

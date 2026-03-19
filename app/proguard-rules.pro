@@ -1,21 +1,58 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# ==================== App 模块混淆规则 ====================
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# 保留行号信息（Crashlytics 堆栈还原）
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# ==================== MediaPipe Tasks Audio ====================
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# MediaPipe 使用 JNI + 反射加载模型和处理器
+-keep class com.google.mediapipe.** { *; }
+-dontwarn com.google.mediapipe.**
+
+# MediaPipe 内部依赖的 protobuf-lite
+-keep class com.google.protobuf.** { *; }
+-dontwarn com.google.protobuf.**
+
+# ==================== TFLite 模型文件 ====================
+
+# YAMNet 模型通过 asset 路径字符串加载，确保 AssetFileDescriptor 相关不被优化
+-keep class org.tensorflow.lite.** { *; }
+-dontwarn org.tensorflow.lite.**
+
+# ==================== toukaremax SDK ====================
+
+-keep class com.remax.** { *; }
+-dontwarn com.remax.**
+-keep class com.toukaremax.** { *; }
+-dontwarn com.toukaremax.**
+
+# ==================== App 自身 Parcelable ====================
+
+# AudioDetectionConfig 通过 Intent extra 传递，Parcelize 生成的 CREATOR 必须保留
+-keep class com.mobile.clap.dev.ml.AudioDetectionConfig { *; }
+-keep class com.mobile.clap.dev.ml.AudioDetectionConfig$* { *; }
+
+# ==================== RemoteViews (自定义通知布局) ====================
+
+# 自定义通知布局中引用的 View ID 通过 RemoteViews 反射访问
+-keep class android.widget.RemoteViews { *; }
+
+# ==================== utilcodex ====================
+
+-keep class com.blankj.utilcode.** { *; }
+-dontwarn com.blankj.utilcode.**
+
+# ==================== Glide ====================
+
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep class * extends com.bumptech.glide.module.AppGlideModule { <init>(...); }
+-keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
+    **[] $VALUES;
+    public *;
+}
+-dontwarn com.bumptech.glide.**
+
+# ==================== Crashlytics 符号映射 ====================
+
+-keepattributes *Annotation*

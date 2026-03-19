@@ -48,20 +48,6 @@
 -keep class androidx.databinding.** { *; }
 -dontwarn androidx.databinding.**
 
-# ==================== Jetpack Compose 混淆规则 ====================
-
-# Compose 相关
--keep class androidx.compose.** { *; }
--dontwarn androidx.compose.**
-
-# Compose 注解
--keep @androidx.compose.runtime.Stable class *
--keep @androidx.compose.runtime.Immutable class *
--keep @androidx.compose.runtime.Composable class *
-
-# Compose 预览
--keep @androidx.compose.ui.tooling.preview.Preview class *
-
 
 # ==================== Kotlin 协程混淆规则 ====================
 
@@ -94,20 +80,8 @@
 
 # ==================== Kotlin Data Class 混淆规则 ====================
 
-# 保护 Kotlin data class 的构造函数和组件函数
--keepclassmembers class * {
-    <init>(...);
-}
-
-# 保护 data class 的 componentN 函数
--keepclassmembers class * {
-    public ** component*();
-}
-
-# 保护 data class 的 copy 函数
--keepclassmembers class * {
-    public ** copy(...);
-}
+# 仅保护通过 Gson 反序列化的 data class（需要无参构造 + 字段名）
+# 通用 Parcelable data class 由 Parcelize 自动处理，无需额外规则
 
 # ==================== Gson 混淆规则 ====================
 
@@ -213,16 +187,6 @@
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
-}
-
-# 保留所有接口
--keep interface * {
-    *;
-}
-
-# 保留所有内部类
--keepclassmembers class * {
-    ** *$*;
 }
 
 # 保留所有自定义异常

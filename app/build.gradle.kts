@@ -101,12 +101,27 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
         }
     }
 
@@ -142,7 +157,7 @@ dependencies {
     implementation(project(":analytics"))
     implementation(project(":base"))
     implementation("com.github.toukaremax:core:1.0.9")
-    implementation("com.github.toukaremax:bill:1.0.10")
+    implementation("com.github.toukaremax:bill:1.0.13")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
