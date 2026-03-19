@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import net.corekit.core.controller.ChannelUserController
+import com.mobile.clap.dev.analytics.CoreSdkTrackerBridge
 import net.corekit.core.log.CoreLogger
 
 class ClapApp : Application() {
@@ -37,6 +38,7 @@ class ClapApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        CoreSdkTrackerBridge.initialize()
         initAdSDK()
     }
 

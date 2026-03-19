@@ -49,13 +49,13 @@ class AlertSoundActivity : AppCompatActivity() {
         SoundItem("Music", R.mipmap.img_setting_music, R.raw.alert_music, hasAd = true),
         SoundItem("Cat", R.mipmap.img_setting_cat, R.raw.alert_cat),
         SoundItem("Dog", R.mipmap.img_setting_dog, R.raw.alert_dog),
-        SoundItem("Alarm", R.mipmap.img_setting_alarm, R.raw.alert_alarm),
-        SoundItem("Hello", R.mipmap.img_setting_hello, R.raw.alert_bell),
-        SoundItem("Whistle", R.mipmap.img_setting_whistle, R.raw.alert_whistle),
+        SoundItem("Alarm", R.mipmap.img_setting_alarm, R.raw.alert_waring),
+        SoundItem("Hello", R.mipmap.img_setting_hello, R.raw.alert_whistle),
+        SoundItem("Whistle", R.mipmap.img_setting_whistle, R.raw.alert_bell),
         SoundItem("Gunshot", R.mipmap.img_setting_gunshot, R.raw.alert_gunshot),
         SoundItem("Piano", R.mipmap.img_setting_piano, R.raw.alert_piano),
         SoundItem("Train", R.mipmap.img_setting_train, R.raw.alert_train),
-        SoundItem("Warning", R.mipmap.img_setting_warning, R.raw.alert_waring)
+        SoundItem("Warning", R.mipmap.img_setting_warning, R.raw.alert_alarm)
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
