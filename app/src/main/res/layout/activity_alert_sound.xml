@@ -55,11 +55,11 @@
             android:paddingTop="10dp"
             android:paddingBottom="16dp">
 
-            <!-- AD Banner placeholder -->
+            <!-- Native Ad Container -->
             <FrameLayout
                 android:id="@+id/adBannerContainer"
                 android:layout_width="match_parent"
-                android:layout_height="194dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/bg_alert_sound_card"
                 android:visibility="gone" />
 

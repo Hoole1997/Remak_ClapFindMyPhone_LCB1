@@ -31,6 +31,9 @@ import com.mobile.clap.dev.service.AudioDetectionService
 import com.mobile.clap.dev.ui.dialog.AlertDurationSettingDialog
 import com.mobile.clap.dev.ui.dialog.MicPermissionDialog
 import com.mobile.clap.dev.ui.dialog.TestMicDialog
+import com.android.common.bill.ads.ext.AdShowExt
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import com.remax.base.ext.KvBoolDelegate
 import com.remax.base.ext.KvIntDelegate
 
@@ -51,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var tvAlertDurationValue: TextView
     private lateinit var tvAlertSoundValue: TextView
+    private lateinit var bannerAdContainer: FrameLayout
 
     private lateinit var switchClap: MaterialSwitch
     private lateinit var switchWhistle: MaterialSwitch
@@ -107,6 +111,7 @@ class MainActivity : AppCompatActivity() {
         setupDebugEntry()
         updateToggleUI(isDetectionOn, animate = false)
         showGuideIfFirstLaunch()
+        loadBannerAd()
     }
 
     private fun showGuideIfFirstLaunch() {
@@ -165,6 +170,7 @@ class MainActivity : AppCompatActivity() {
         switchFlashlight = findViewById(R.id.switchFlashlight)
         tvAlertDurationValue = findViewById(R.id.tvAlertDurationValue)
         tvAlertSoundValue = findViewById(R.id.tvAlertSoundValue)
+        bannerAdContainer = findViewById(R.id.bannerAdContainer)
         updateAlertDurationDisplay()
         updateAlertSoundDisplay()
 
@@ -471,6 +477,12 @@ class MainActivity : AppCompatActivity() {
         updateAlertSoundDisplay()
         // 从 AlertSoundActivity 返回后，将最新配置推送给服务
         updateServiceConfig()
+    }
+
+    private fun loadBannerAd() {
+        lifecycleScope.launch {
+            AdShowExt.showBannerAd(this@MainActivity, bannerAdContainer)
+        }
     }
 
     private fun setupDebugEntry() {

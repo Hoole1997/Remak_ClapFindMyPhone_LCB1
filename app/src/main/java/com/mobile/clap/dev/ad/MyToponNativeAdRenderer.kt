@@ -1,0 +1,68 @@
+package com.mobile.clap.dev.ad
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import com.android.common.bill.ads.renderer.ToponNativeAdRenderer
+import com.mobile.clap.dev.R
+import com.thinkup.nativead.api.TUNativeMaterial
+import com.thinkup.nativead.api.TUNativePrepareInfo
+
+class MyToponNativeAdRenderer : ToponNativeAdRenderer {
+
+    override fun createLayout(context: Context): ViewGroup {
+        return LayoutInflater.from(context)
+            .inflate(R.layout.layout_native_ad_topon, null, false) as ViewGroup
+    }
+
+    override fun bindData(adView: ViewGroup, material: TUNativeMaterial) {
+        val ivIcon = adView.findViewById<ImageView>(R.id.iv_ad_icon)
+        val tvTitle = adView.findViewById<TextView>(R.id.tv_ad_title)
+        val tvDesc = adView.findViewById<TextView>(R.id.tv_ad_desc)
+        val tvCta = adView.findViewById<TextView>(R.id.tv_ad_cta)
+
+        tvTitle.text = material.title
+        tvDesc.text = material.descriptionText
+        tvCta.text = material.callToActionText
+
+        material.iconImageUrl?.let { url ->
+            loadImageInto(url, ivIcon)
+        }
+    }
+
+    override fun createPrepareInfo(adView: ViewGroup): TUNativePrepareInfo {
+        val tvTitle = adView.findViewById<TextView>(R.id.tv_ad_title)
+        val tvDesc = adView.findViewById<TextView>(R.id.tv_ad_desc)
+        val tvCta = adView.findViewById<TextView>(R.id.tv_ad_cta)
+        val ivIcon = adView.findViewById<ImageView>(R.id.iv_ad_icon)
+
+        return TUNativePrepareInfo().apply {
+            titleView = tvTitle
+            descView = tvDesc
+            ctaView = tvCta
+            iconView = ivIcon
+        }
+    }
+
+    private fun loadImageInto(url: String, imageView: ImageView) {
+        try {
+            val thread = Thread {
+                try {
+                    val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+                    connection.doInput = true
+                    connection.connect()
+                    val input = connection.inputStream
+                    val bitmap = android.graphics.BitmapFactory.decodeStream(input)
+                    imageView.post { imageView.setImageBitmap(bitmap) }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            thread.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}

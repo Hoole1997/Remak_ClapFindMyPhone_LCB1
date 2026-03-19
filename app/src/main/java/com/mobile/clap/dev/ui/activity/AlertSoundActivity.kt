@@ -1,6 +1,7 @@
 package com.mobile.clap.dev.ui.activity
 
 import android.graphics.Rect
+import android.util.Log
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -18,6 +19,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.common.bill.ads.ext.AdShowExt
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import com.mobile.clap.dev.R
 import com.mobile.clap.dev.service.AudioDetectionService
 import com.remax.base.ext.KvIntDelegate
@@ -28,6 +32,7 @@ class AlertSoundActivity : AppCompatActivity() {
     private lateinit var tvVolumePercent: TextView
     private lateinit var rvSounds: RecyclerView
     private lateinit var btnSave: TextView
+    private lateinit var adBannerContainer: FrameLayout
 
     private lateinit var audioMgr: AudioManager
     private var previewPlayer: MediaPlayer? = null
@@ -69,6 +74,7 @@ class AlertSoundActivity : AppCompatActivity() {
         setupVolumeSeekBar()
         setupSoundGrid()
         setupListeners()
+        loadNativeAd()
     }
 
     private fun setupEdgeToEdge() {
@@ -86,6 +92,7 @@ class AlertSoundActivity : AppCompatActivity() {
         tvVolumePercent = findViewById(R.id.tvVolumePercent)
         rvSounds = findViewById(R.id.rvSounds)
         btnSave = findViewById(R.id.btnSave)
+        adBannerContainer = findViewById(R.id.adBannerContainer)
     }
 
     private fun setupVolumeSeekBar() {
@@ -231,6 +238,30 @@ class AlertSoundActivity : AppCompatActivity() {
             e.printStackTrace()
         }
         previewPlayer = null
+    }
+
+    private fun loadNativeAd() {
+        Log.d("AlertSoundActivity", "loadNativeAd() called, container visibility=${adBannerContainer.visibility}")
+        lifecycleScope.launch {
+            try {
+                val maxRetries = 3
+                for (attempt in 1..maxRetries) {
+                    Log.d("AlertSoundActivity", "showNativeAdInContainer attempt $attempt/$maxRetries")
+                    val success = AdShowExt.showNativeAdInContainer(this@AlertSoundActivity, adBannerContainer)
+                    Log.d("AlertSoundActivity", "showNativeAdInContainer result: $success")
+                    if (success) {
+                        adBannerContainer.visibility = View.VISIBLE
+                        return@launch
+                    }
+                    if (attempt < maxRetries) {
+                        Log.d("AlertSoundActivity", "Retrying after 3s delay...")
+                        kotlinx.coroutines.delay(3000)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("AlertSoundActivity", "loadNativeAd failed", e)
+            }
+        }
     }
 
     override fun onResume() {

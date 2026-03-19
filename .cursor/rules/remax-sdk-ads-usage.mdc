@@ -1,0 +1,35 @@
+---
+description: ReMax SDK 广告库 Kotlin 使用规范
+globs: **/*.kt
+alwaysApply: false
+---
+
+# ReMax SDK Ads Usage (Kotlin)
+
+适用于项目内 Kotlin 代码中的 ReMax SDK（`core` / `bill`）调用与接入。
+
+## 基本原则
+
+- 使用远程依赖版本：`com.github.toukaremax:core:1.0.9`、`com.github.toukaremax:bill:1.0.10`。
+- 广告能力统一通过 `AdShowExt`、`PreloadController`、`AppOpenBiddingInitializer` 入口调用，不重复封装平行入口。
+- 渠道与日志在 `Application.attachBaseContext()` 初始化：`ChannelUserController.setDefaultChannel(...)`、`CoreLogger`、`AdLogger`。
+
+## 初始化约束
+
+- 在应用启动早期完成 `AppOpenBiddingInitializer.initialize(...)`，一次性注入 AdMob/Pangle/TopOn/MAX 配置。
+- 初始化时显式提供原生广告渲染器（普通原生 + 全屏原生）与 Loading Dialog 渲染器，避免默认空实现。
+- 回调中涉及 UI 更新时，保持主线程安全（`lifecycleScope` / `Main` 调度）。
+
+## 展示调用约束
+
+- 开屏：使用 `showAppOpenAd(...)`，需要倒计时或竞价时通过参数显式声明。
+- 插页：使用 `showInterstitialAd(...)`，涉及兜底策略时明确 `ignoreFullNative` / `biddingResult`。
+- 激励：使用 `showRewardedAd(...)`，奖励发放逻辑放在 `onRewardEarned` 内，避免前置发奖。
+- 原生/Banner：使用 `showNativeAdInContainer(...)`、`showFullScreenNativeAdInContainer(...)`、`showBannerAd(...)`，确保容器生命周期可控。
+- 预加载：使用 `PreloadController.preloadAll(...)` 或 `preloadAllFullScreenNative(...)`，不要手动并行调用多平台底层控制器。
+
+## 配置与容错
+
+- 远程配置 Key 使用：`adConfigNaturalJson`、`adConfigPaidJson`；遵循“远程缓存 > 本地 assets > 默认空配置”。
+- 业务代码不得硬编码广告平台开关或频控阈值，优先走配置中心（本地/远程 JSON）。
+- 新增广告位时同步更新：配置键、展示埋点、失败兜底与频控策略。
