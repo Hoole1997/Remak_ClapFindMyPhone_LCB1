@@ -36,13 +36,13 @@ object AlertSoundResources {
         AlertSound(2, "Music", R.mipmap.img_setting_music, R.raw.alert_music),
         AlertSound(3, "Cat", R.mipmap.img_setting_cat, R.raw.alert_cat),
         AlertSound(4, "Dog", R.mipmap.img_setting_dog, R.raw.alert_dog),
-        AlertSound(5, "Alarm", R.mipmap.img_setting_alarm, R.raw.alert_alarm),
-        AlertSound(6, "Hello", R.mipmap.img_setting_hello, R.raw.alert_bell),
-        AlertSound(7, "Whistle", R.mipmap.img_setting_whistle, R.raw.alert_whistle),
+        AlertSound(5, "Alarm", R.mipmap.img_setting_alarm, R.raw.alert_waring),
+        AlertSound(6, "Hello", R.mipmap.img_setting_hello, R.raw.alert_whistle),
+        AlertSound(7, "Whistle", R.mipmap.img_setting_whistle, R.raw.alert_bell),
         AlertSound(8, "Gunshot", R.mipmap.img_setting_gunshot, R.raw.alert_gunshot),
         AlertSound(9, "Piano", R.mipmap.img_setting_piano, R.raw.alert_piano),
         AlertSound(10, "Train", R.mipmap.img_setting_train, R.raw.alert_train),
-        AlertSound(11, "Warning", R.mipmap.img_setting_warning, R.raw.alert_waring),
+        AlertSound(11, "Warning", R.mipmap.img_setting_warning, R.raw.alert_alarm),
     )
 
     /**
