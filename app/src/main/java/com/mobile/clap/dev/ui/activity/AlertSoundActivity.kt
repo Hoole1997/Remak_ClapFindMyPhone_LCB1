@@ -218,9 +218,29 @@ class AlertSoundActivity : AppCompatActivity() {
     private fun playPreviewSound(resId: Int) {
         stopPreviewSound()
         try {
-            audioMgr.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
-            previewPlayer = MediaPlayer.create(this, resId)?.apply {
+            // 使用 STREAM_ALARM 播放预览，与 DeviceAlertManager 保持一致
+            val maxMusicVol = audioMgr.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            val maxAlarmVol = audioMgr.getStreamMaxVolume(AudioManager.STREAM_ALARM)
+            val alarmVol = if (maxMusicVol > 0) {
+                ((currentVolume.toFloat() / maxMusicVol) * maxAlarmVol).toInt()
+                    .coerceIn(if (currentVolume > 0) 1 else 0, maxAlarmVol)
+            } else {
+                maxAlarmVol
+            }
+            audioMgr.setStreamVolume(AudioManager.STREAM_ALARM, alarmVol, 0)
+
+            val attributes = android.media.AudioAttributes.Builder()
+                .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+
+            previewPlayer = MediaPlayer().apply {
+                setAudioAttributes(attributes)
+                resources.openRawResourceFd(resId)?.use { afd ->
+                    setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                }
                 setOnCompletionListener { release() }
+                prepare()
                 start()
             }
         } catch (e: Exception) {

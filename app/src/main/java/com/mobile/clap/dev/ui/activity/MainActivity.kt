@@ -67,8 +67,8 @@ class MainActivity : AppCompatActivity() {
     private var alertSoundIndex by KvIntDelegate("alert_sound_index", 3)
     private var alertVolumeSaved by KvIntDelegate("alert_volume", -1)
 
-    private var clapEnabled by KvBoolDelegate("switch_clap", true)
-    private var whistleEnabled by KvBoolDelegate("switch_whistle", true)
+    private var clapEnabled by KvBoolDelegate("switch_clap", false)
+    private var whistleEnabled by KvBoolDelegate("switch_whistle", false)
     private var soundEnabled by KvBoolDelegate("switch_sound", true)
     private var vibrationEnabled by KvBoolDelegate("switch_vibration", true)
     private var flashlightEnabled by KvBoolDelegate("switch_flashlight", true)
@@ -278,7 +278,13 @@ class MainActivity : AppCompatActivity() {
             alertVolume = if (soundEnabled) {
                 val audioManager = getSystemService(AUDIO_SERVICE) as android.media.AudioManager
                 val maxVol = audioManager.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
-                if (alertVolumeSaved < 0) maxVol else alertVolumeSaved.coerceIn(1, maxVol)
+                if (alertVolumeSaved < 0) {
+                    // 未保存时使用当前系统音量，与 AlertSoundActivity 显示一致
+                    audioManager.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
+                        .coerceIn(1, maxVol)
+                } else {
+                    alertVolumeSaved.coerceIn(1, maxVol)
+                }
             } else 0
         )
     }
