@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
     }
 
-    private var isDetectionOn = false
+    private var isDetectionOn by KvBoolDelegate("detection_on", false)
     private var isUpdatingFromCode = false
 
     private lateinit var tvDetectionStatus: TextView
@@ -110,8 +110,16 @@ class MainActivity : AppCompatActivity() {
         setupListeners()
         setupDebugEntry()
         updateToggleUI(isDetectionOn, animate = false)
+        restoreDetectionState()
         showGuideIfFirstLaunch()
         loadBannerAd()
+    }
+
+    private fun restoreDetectionState() {
+        if (isDetectionOn) {
+            val config = buildDetectionConfig()
+            AudioDetectionService.start(this, config)
+        }
     }
 
     private fun showGuideIfFirstLaunch() {
@@ -279,9 +287,11 @@ class MainActivity : AppCompatActivity() {
                 val audioManager = getSystemService(AUDIO_SERVICE) as android.media.AudioManager
                 val maxVol = audioManager.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
                 if (alertVolumeSaved < 0) {
-                    // 未保存时使用当前系统音量，与 AlertSoundActivity 显示一致
-                    audioManager.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
+                    // 未保存时使用当前系统音量，立即持久化确保与 AlertSoundActivity 一致
+                    val vol = audioManager.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
                         .coerceIn(1, maxVol)
+                    alertVolumeSaved = vol
+                    vol
                 } else {
                     alertVolumeSaved.coerceIn(1, maxVol)
                 }

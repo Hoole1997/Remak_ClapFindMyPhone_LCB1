@@ -52,7 +52,7 @@ data class AudioDetectionConfig(
     companion object {
         const val DEFAULT_TRIGGER_COUNT = 1
         const val DEFAULT_ALERT_DURATION = 10
-        val DEFAULT_SENSITIVITY = Sensitivity.MEDIUM
+        val DEFAULT_SENSITIVITY = Sensitivity.HIGH
         const val DEFAULT_FLASHLIGHT_ENABLED = true
         const val DEFAULT_VIBRATION_ENABLED = true
         const val DEFAULT_WHISTLE_ENABLED = false

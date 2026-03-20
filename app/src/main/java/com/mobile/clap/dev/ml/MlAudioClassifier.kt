@@ -23,11 +23,11 @@ class MlAudioClassifier(private val context: Context) {
         private const val MODEL_FILE = "yamnet.tflite"
         
         // 置信度阈值
-        private const val BASE_SCORE_THRESHOLD = 0.3f
-        private const val CONFIRM_CONFIDENCE_THRESHOLD = 0.5f
+        private const val BASE_SCORE_THRESHOLD = 0.15f
+        private const val CONFIRM_CONFIDENCE_THRESHOLD = 0.3f
         
         // 最大返回结果数
-        private const val MAX_RESULTS = 2
+        private const val MAX_RESULTS = 5
         
         // 采样率（YAMNet 期望 16kHz）
         const val SAMPLE_RATE = 16000
