@@ -12,6 +12,20 @@ fun secretValue(name: String): String {
     }
 }
 
+fun resolveSigningFile(path: String): File {
+    val configuredFile = File(path)
+    if (configuredFile.isAbsolute) {
+        return configuredFile
+    }
+
+    val rootRelativeFile = rootProject.file(path)
+    if (rootRelativeFile.exists()) {
+        return rootRelativeFile
+    }
+
+    return file(path.removePrefix("app/"))
+}
+
 val configSetting = findProperty("setting") as Map<*, *>
 val link = findProperty("link") as Map<*, *>
 val adMobConfig = findProperty("admob") as? Map<*, *> ?: emptyMap<Any, Any>()
@@ -24,9 +38,9 @@ val maxConfig = findProperty("max") as? Map<*, *> ?: emptyMap<Any, Any>()
 val maxUnitConfig = maxConfig["adUnitIds"] as? Map<*, *> ?: emptyMap<Any, Any>()
 val analyticsConfig = findProperty("analytics") as? Map<*, *> ?: emptyMap<Any, Any>()
 val officialReleaseKeystorePath = secretValue("ANDROID_SIGNING_STORE_FILE").ifBlank {
-    "src/official/official-release.keystore"
+    "app/src/official/official-release.keystore"
 }
-val officialReleaseKeystoreFile = file(officialReleaseKeystorePath)
+val officialReleaseKeystoreFile = resolveSigningFile(officialReleaseKeystorePath)
 val officialReleaseStorePassword = secretValue("ANDROID_SIGNING_STORE_PASSWORD").ifBlank {
     "official123456"
 }

@@ -19,7 +19,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      KEYSTORE_PATH: app/src/official/official-release.keystore
+      KEYSTORE_REPO_PATH: app/src/official/official-release.keystore
+      KEYSTORE_GRADLE_PATH: app/src/official/official-release.keystore
       KEYSTORE_ALIAS: official
       KEYSTORE_PASSWORD: official123456
       KEY_PASSWORD: official123456
@@ -44,10 +45,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          mkdir -p "$(dirname "$KEYSTORE_PATH")"
+          mkdir -p "$(dirname "$KEYSTORE_REPO_PATH")"
 
-          if [ -f "$KEYSTORE_PATH" ] && [ -s "$KEYSTORE_PATH" ]; then
-            echo "Using existing keystore: $KEYSTORE_PATH"
+          if [ -f "$KEYSTORE_REPO_PATH" ] && [ -s "$KEYSTORE_REPO_PATH" ]; then
+            echo "Using existing keystore: $KEYSTORE_REPO_PATH"
             echo "created=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -55,7 +56,7 @@ jobs:
           keytool -genkeypair \
             -v \
             -storetype PKCS12 \
-            -keystore "$KEYSTORE_PATH" \
+            -keystore "$KEYSTORE_REPO_PATH" \
             -storepass "$KEYSTORE_PASSWORD" \
             -keypass "$KEY_PASSWORD" \
             -alias "$KEYSTORE_ALIAS" \
@@ -70,7 +71,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: official-release-keystore
-          path: ${{ env.KEYSTORE_PATH }}
+          path: ${{ env.KEYSTORE_REPO_PATH }}
           if-no-files-found: error
           retention-days: 30
 
@@ -88,7 +89,7 @@ jobs:
           branch: codex/official-release-keystore
           delete-branch: false
           add-paths: |
-            ${{ env.KEYSTORE_PATH }}
+            ${{ env.KEYSTORE_REPO_PATH }}
 
       - name: Grant Gradle wrapper permission
         run: chmod +x ./gradlew
@@ -106,7 +107,7 @@ jobs:
 
       - name: Build signed officialRelease AAB
         env:
-          ANDROID_SIGNING_STORE_FILE: ${{ env.KEYSTORE_PATH }}
+          ANDROID_SIGNING_STORE_FILE: ${{ env.KEYSTORE_GRADLE_PATH }}
           ANDROID_SIGNING_STORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
           ANDROID_SIGNING_KEY_ALIAS: ${{ env.KEYSTORE_ALIAS }}
           ANDROID_SIGNING_KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
