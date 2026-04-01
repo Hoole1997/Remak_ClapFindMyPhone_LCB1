@@ -6,6 +6,12 @@ plugins {
     id("kotlin-parcelize")
 }
 
+fun secretValue(name: String): String {
+    return (findProperty(name) as? String).orEmpty().ifBlank {
+        System.getenv(name).orEmpty()
+    }
+}
+
 val configSetting = findProperty("setting") as Map<*, *>
 val link = findProperty("link") as Map<*, *>
 val adMobConfig = findProperty("admob") as? Map<*, *> ?: emptyMap<Any, Any>()
@@ -17,6 +23,27 @@ val toponUnitConfig = toponConfig["adUnitIds"] as? Map<*, *> ?: emptyMap<Any, An
 val maxConfig = findProperty("max") as? Map<*, *> ?: emptyMap<Any, Any>()
 val maxUnitConfig = maxConfig["adUnitIds"] as? Map<*, *> ?: emptyMap<Any, Any>()
 val analyticsConfig = findProperty("analytics") as? Map<*, *> ?: emptyMap<Any, Any>()
+val officialReleaseKeystorePath = secretValue("ANDROID_SIGNING_STORE_FILE").ifBlank {
+    "src/official/official-release.keystore"
+}
+val officialReleaseKeystoreFile = file(officialReleaseKeystorePath)
+val officialReleaseStorePassword = secretValue("ANDROID_SIGNING_STORE_PASSWORD").ifBlank {
+    "official123456"
+}
+val officialReleaseKeyAlias = secretValue("ANDROID_SIGNING_KEY_ALIAS").ifBlank {
+    "official"
+}
+val officialReleaseKeyPassword = secretValue("ANDROID_SIGNING_KEY_PASSWORD").ifBlank {
+    "official123456"
+}
+val hasOfficialReleaseSigning = officialReleaseKeystoreFile.isFile &&
+        officialReleaseKeystoreFile.length() > 0L &&
+        officialReleaseStorePassword.isNotBlank() &&
+        officialReleaseKeyAlias.isNotBlank() &&
+        officialReleaseKeyPassword.isNotBlank()
+val requiresOfficialReleaseSigning = gradle.startParameter.taskNames.any {
+    it.contains("official", ignoreCase = true) && it.contains("release", ignoreCase = true)
+}
 
 android {
     namespace = "com.mobile.clap.dev"
@@ -74,10 +101,21 @@ android {
         manifestPlaceholders["ADMOB_APPLICATION_ID"] = adMobConfig["applicationId"]?.toString().orEmpty()
 
         ndk {
-            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
+            abiFilters.addAll(listOf("arm64-v8a"))
         }
 
         multiDexEnabled = true
+    }
+
+    signingConfigs {
+        create("officialRelease") {
+            if (hasOfficialReleaseSigning) {
+                storeFile = officialReleaseKeystoreFile
+                storePassword = officialReleaseStorePassword
+                keyAlias = officialReleaseKeyAlias
+                keyPassword = officialReleaseKeyPassword
+            }
+        }
     }
 
     // Flavor 配置
@@ -115,6 +153,10 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = false
+            check(hasOfficialReleaseSigning || !requiresOfficialReleaseSigning) {
+                "Missing official release signing config. Ensure app/src/official/official-release.keystore exists or set ANDROID_SIGNING_STORE_FILE, ANDROID_SIGNING_STORE_PASSWORD, ANDROID_SIGNING_KEY_ALIAS, and ANDROID_SIGNING_KEY_PASSWORD."
+            }
+            signingConfig = signingConfigs.getByName("officialRelease")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
