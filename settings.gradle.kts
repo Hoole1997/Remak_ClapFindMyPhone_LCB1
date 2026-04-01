@@ -1,6 +1,9 @@
 import java.util.Properties
 
 pluginManagement {
+    plugins {
+        id("com.android.settings") version "8.13.0"
+    }
     repositories {
         google {
             content {
@@ -13,6 +16,33 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+plugins {
+    id("com.android.settings")
+}
+
+android {
+    execution {
+        profiles {
+            create("default") {
+                r8.runInSeparateProcess = false
+            }
+            create("lowMemory") {
+                r8 {
+                    runInSeparateProcess = true
+                    jvmOptions += listOf(
+                        "-Xms256m",
+                        "-Xmx6g",
+                        "-XX:MaxMetaspaceSize=1g",
+                        "-Dfile.encoding=UTF-8",
+                    )
+                }
+            }
+            defaultProfile = "default"
+        }
+    }
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -61,6 +91,9 @@ dependencyResolutionManagement {
             content {
                 includeGroup("com.vungle")
             }
+        }
+        maven {
+            url = uri("https://artifacts.applovin.com/android")
         }
         maven("https://cboost.jfrog.io/artifactory/chartboost-ads")
         maven("https://repo.dgtverse.cn/repository/maven-public")
