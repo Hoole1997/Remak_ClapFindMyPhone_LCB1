@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "561578497072",
-    "project_id": "clapfindmyphone-fd67a",
-    "storage_bucket": "clapfindmyphone-fd67a.firebasestorage.app"
+    "project_number": "853305115323",
+    "project_id": "agf0f2726670-c7791-gp",
+    "storage_bucket": "agf0f2726670-c7791-gp.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:561578497072:android:1b13bdd501dc49705a09f5",
+        "mobilesdk_app_id": "1:853305115323:android:4d0371b20a992d38f9df9e",
         "android_client_info": {
-          "package_name": "com.mobile.clap.official"
+          "package_name": "com.find.your.phone.by.clap.tool"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCnmooKx4EWZXyeZtdkjg_6Hp9HSMsHcZg"
+          "current_key": "AIzaSyD9QBrYZoErEBLvEC9aYXkwa1g_kcPqkHE"
         }
       ],
       "services": {

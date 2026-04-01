@@ -16,6 +16,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +34,7 @@ import com.mobile.clap.dev.ui.dialog.MicPermissionDialog
 import com.mobile.clap.dev.ui.dialog.TestMicDialog
 import com.android.common.bill.ads.ext.AdShowExt
 import androidx.lifecycle.lifecycleScope
+import com.mobile.clap.dev.ClapApp
 import kotlinx.coroutines.launch
 import com.remax.base.ext.KvBoolDelegate
 import com.remax.base.ext.KvIntDelegate
@@ -101,7 +103,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main_home)
 
         setupEdgeToEdge()
         initViews()
@@ -156,10 +158,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupEdgeToEdge() {
         val statusBarSpacer = findViewById<View>(R.id.statusBarSpacer)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { _, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             statusBarSpacer.layoutParams.height = systemBars.top
             statusBarSpacer.requestLayout()
+            v.setPadding(0, 0, 0, systemBars.bottom)
             insets
         }
     }
@@ -478,6 +481,11 @@ class MainActivity : AppCompatActivity() {
                 .show(supportFragmentManager, AlertDurationSettingDialog.TAG)
         }
 
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                ClapApp.clapApp?.ultracorebattery()
+            }
+        })
     }
 
     private fun updateAlertDurationDisplay() {

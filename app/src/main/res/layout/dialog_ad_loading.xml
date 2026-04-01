@@ -39,6 +39,14 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/iv_close"
+            android:src="@drawable/ia_close"
+            android:layout_gravity="end"
+            android:padding="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
     </androidx.cardview.widget.CardView>
 
 </FrameLayout>

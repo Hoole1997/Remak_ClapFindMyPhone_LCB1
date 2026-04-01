@@ -103,7 +103,7 @@ android {
     buildTypes {
         debug {
             isMinifyEnabled = true
-            isShrinkResources = true
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -114,7 +114,7 @@ android {
         }
         release {
             isMinifyEnabled = true
-            isShrinkResources = true
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -131,7 +131,7 @@ android {
         variant.outputs
             .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
             .forEach { output ->
-                val outputFileName = "ClapFindMyPhone - ${variant.baseName} - ${variant.versionName}.apk"
+                val outputFileName = "LCB_ClapFindMyPhone2 - ${variant.baseName} - ${variant.versionName}.apk"
                 output.outputFileName = outputFileName
             }
     }
@@ -156,8 +156,8 @@ android {
 dependencies {
     implementation(project(":analytics"))
     implementation(project(":base"))
-    implementation("com.github.toukaremax:core:1.0.9")
-    implementation("com.github.toukaremax:bill:1.0.13")
+    implementation(project(":bill"))
+    implementation(project(":core"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -1,6 +1,6 @@
 ext {
     // 应用版本配置
-    setting = [applicationId: "com.mobile.clap.official",
+    setting = [applicationId: "com.find.your.phone.by.clap.tool",
                compileSdk   : 36,
                minSdk       : 26,
                targetSdk    : 36,
@@ -13,34 +13,34 @@ ext {
     ]
 
     // AdMob配置
-    admob = [applicationId: "",
-             adUnitIds    : [banner      : "",
-                             interstitial: "",
-                             splash      : "",
-                             native      : "",
-                             full_native : "",
-                             rewarded    : ""
+    admob = [applicationId: "ca-app-pub-7869168547621070~6618410746",
+             adUnitIds    : [banner      : "ca-app-pub-7869168547621070/8270537213",
+                             interstitial: "ca-app-pub-7869168547621070/6055437415",
+                             splash      : "ca-app-pub-7869168547621070/9504695437",
+                             native      : "ca-app-pub-7869168547621070/1074573471",
+                             full_native : "ca-app-pub-7869168547621070/6957455540",
+                             rewarded    : "ca-app-pub-7869168547621070/3429274072"
              ]]
 
     // Pangle配置
-    pangle = [applicationId: "",
-              adUnitIds    : [splash      : "",
-                              banner      : "",
-                              interstitial: "",
-                              native      : "",
-                              full_native : "",
-                              rewarded    : ""
+    pangle = [applicationId: "8805730",
+              adUnitIds    : [splash      : "890139013",
+                              banner      : "982980469",
+                              interstitial: "982980466",
+                              native      : "982980480",
+                              full_native : "982980459",
+                              rewarded    : "982980467"
               ]]
 
     // TopOn配置
-    topon = [applicationId: "",
-             appKey       : "",
-             adUnitIds    : [interstitial: "",
-                             rewarded    : "",
-                             native      : "",
-                             splash      : "",
-                             full_native : "",
-                             banner      : ""]
+    topon = [applicationId: "h1h7u0aa941v69",
+             appKey       : "a2d44a1c081e938baf1644056071cecdc",
+             adUnitIds    : [interstitial: "n1h7u0aaavncqj",
+                             rewarded    : "n1h7u0aaaetktg",
+                             native      : "n1h7u0aac12p68",
+                             splash      : "n1h7u0aadn88lu",
+                             full_native : "n1h7u0aaetce9r",
+                             banner      : "n1h7u0aagagi1t"]
     ]
 
     // MAX (AppLovin) 配置

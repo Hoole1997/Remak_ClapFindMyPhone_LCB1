@@ -19,6 +19,9 @@ firebaseBom = "34.1.0"
 glide = "4.16.0"
 lottie = "6.4.0"
 gson = "2.10.1"
+ksp = "2.2.0-2.0.2"
+okhttp = "4.12.0"
+playServicesAds = "24.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +50,8 @@ firebase-config = { group = "com.google.firebase", name = "firebase-config" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -55,4 +60,5 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 room = { id = "androidx.room", version.ref = "roomRuntime" }
 google-services = { id = "com.google.gms.google-services", version = "4.4.3" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.6" }
+google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

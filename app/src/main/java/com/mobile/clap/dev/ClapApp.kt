@@ -3,16 +3,16 @@ package com.mobile.clap.dev
 import android.app.Application
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import com.android.common.bill.BillConfig
 import com.android.common.bill.ads.PreloadController
 import com.android.common.bill.ads.bidding.AppOpenBiddingInitializer
 import com.android.common.bill.ads.log.AdLogger
 import com.android.common.bill.ads.renderer.AdLoadingDialogRenderer
+import com.blankj.utilcode.util.LogUtils
 import com.mobile.clap.dev.ad.MyAdmobFullScreenNativeAdRenderer
 import com.mobile.clap.dev.ad.MyAdmobNativeAdRenderer
-import com.mobile.clap.dev.ad.MyMaxFullScreenNativeAdRenderer
-import com.mobile.clap.dev.ad.MyMaxNativeAdRenderer
 import com.mobile.clap.dev.ad.MyPangleFullScreenNativeAdRenderer
 import com.mobile.clap.dev.ad.MyPangleNativeAdRenderer
 import com.mobile.clap.dev.ad.MyToponFullScreenNativeAdRenderer
@@ -23,11 +23,20 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import net.corekit.core.controller.ChannelUserController
 import com.mobile.clap.dev.analytics.CoreSdkTrackerBridge
+import com.mobile.clap.dev.ui.activity.AlertSoundActivity
+import com.mobile.clap.dev.ui.activity.ClapSplashActivity
+import com.mobile.clap.dev.ui.activity.DebugActivity
+import com.mobile.clap.dev.ui.activity.MainActivity
+import com.remax.analytics.adjust.AdjustController
 import net.corekit.core.log.CoreLogger
 
-class ClapApp : Application() {
+class ClapApp : com.find.your.phone.by.clap.tool.Rbs6d4cptydhri() {
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    companion object {
+        var clapApp: ClapApp?=null
+    }
 
     override fun attachBaseContext(base: android.content.Context) {
         super.attachBaseContext(base)
@@ -38,7 +47,19 @@ class ClapApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        clapApp = this
         CoreSdkTrackerBridge.initialize()
+        this.smartcleancorewifi {isOrganic, network, campaign, adgroup, creative, jsonResponse ->
+            AdjustController.initialize(
+                context = applicationContext,
+                network = network,
+                campaign = campaign,
+                adgroup = adgroup,
+                creative = creative,
+                jsonResponse = jsonResponse
+            )
+            LogUtils.i("onCreate: isOrganic = $isOrganic , network = $network , campaign = $campaign , adgroup = $adgroup , creative = $creative , jsonResponse = $jsonResponse")
+        }
         initAdSDK()
     }
 
@@ -75,15 +96,7 @@ class ClapApp : Application() {
                     fullNativeId = BuildConfig.TOPON_FULL_NATIVE_ID,
                     rewardedId = BuildConfig.TOPON_REWARDED_ID
                 )
-                max = BillConfig.MaxConfig(
-                    sdkKey = BuildConfig.MAX_SDK_KEY,
-                    splashId = BuildConfig.MAX_SPLASH_ID,
-                    bannerId = BuildConfig.MAX_BANNER_ID,
-                    interstitialId = BuildConfig.MAX_INTERSTITIAL_ID,
-                    nativeId = BuildConfig.MAX_NATIVE_ID,
-                    fullNativeId = BuildConfig.MAX_FULL_NATIVE_ID,
-                    rewardedId = BuildConfig.MAX_REWARDED_ID
-                )
+
                 adLoadingDialogRenderer = object : AdLoadingDialogRenderer {
                     override fun getLayoutResId(): Int = R.layout.dialog_ad_loading
 
@@ -95,6 +108,10 @@ class ClapApp : Application() {
                         view.findViewById<TextView>(R.id.tv_ad_loading)?.text = text
                     }
 
+                    override fun findCloseView(view: View): View? {
+                        return view.findViewById<ImageView>(R.id.iv_close)
+                    }
+
                     override fun onDestroy(view: View) = Unit
                 }
 
@@ -104,9 +121,6 @@ class ClapApp : Application() {
                 pangleFullScreenNativeRenderer = MyPangleFullScreenNativeAdRenderer()
                 toponNativeRenderer = MyToponNativeAdRenderer()
                 toponFullScreenNativeRenderer = MyToponFullScreenNativeAdRenderer()
-                maxNativeRenderer = MyMaxNativeAdRenderer()
-                maxFullScreenNativeRenderer = MyMaxFullScreenNativeAdRenderer()
-
             }
             Log.d("ClapApp", "AppOpenBiddingInitializer.initialize() completed, starting preload...")
             CoreLogger.setLogEnabled(BuildConfig.DEBUG)
@@ -114,5 +128,18 @@ class ClapApp : Application() {
             PreloadController.preloadAll(this@ClapApp)
             Log.d("ClapApp", "PreloadController.preloadAll() completed")
         }
+    }
+
+    override fun dailysafehub(): Class<in Any>? {
+        return ClapSplashActivity::class.java as Class<in Any>?
+    }
+
+    override fun restoreprolocker(): List<Class<in Any>?>? {
+        return listOf(
+            ClapSplashActivity::class.java,
+            MainActivity::class.java,
+            AlertSoundActivity::class.java,
+            DebugActivity::class.java,
+        ) as List<Class<in Any>?>?
     }
 }

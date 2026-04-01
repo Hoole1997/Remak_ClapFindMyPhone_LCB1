@@ -1,11 +1,12 @@
 package com.mobile.clap.dev.ui.activity
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.mobile.clap.dev.R
@@ -14,6 +15,10 @@ import com.remax.base.ext.KvBoolDelegate
 class ClapSplashActivity : AppCompatActivity() {
 
     private var splashShown by KvBoolDelegate("splash_shown", false)
+
+    private companion object {
+        const val AGREEMENT_URL = "https://xoxneaxrch.com/privacy.html"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,11 +53,22 @@ class ClapSplashActivity : AppCompatActivity() {
         }
 
         tvPrivacyPolicy.setOnClickListener {
-            // TODO: Open Privacy Policy
+            openAgreementPage()
         }
 
         tvTermsOfService.setOnClickListener {
-            // TODO: Open Terms of Service
+            openAgreementPage()
+        }
+    }
+
+    private fun openAgreementPage() {
+        val agreementUri = Uri.parse(AGREEMENT_URL)
+        val customTabsIntent = CustomTabsIntent.Builder().build()
+
+        runCatching {
+            customTabsIntent.launchUrl(this, agreementUri)
+        }.onFailure {
+            startActivity(Intent(Intent.ACTION_VIEW, agreementUri))
         }
     }
 }
