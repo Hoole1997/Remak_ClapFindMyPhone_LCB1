@@ -205,13 +205,11 @@ class AlertSoundActivity : AppCompatActivity() {
             )
 
             holder.itemView.setOnClickListener {
-                loadInterstitial {
-                    val previousSelected = selectedSoundIndex
-                    selectedSoundIndex = holder.bindingAdapterPosition
-                    notifyItemChanged(previousSelected)
-                    notifyItemChanged(selectedSoundIndex)
-                    playPreviewSound(soundItems[selectedSoundIndex].rawResId)
-                }
+                val previousSelected = selectedSoundIndex
+                selectedSoundIndex = holder.bindingAdapterPosition
+                notifyItemChanged(previousSelected)
+                notifyItemChanged(selectedSoundIndex)
+                playPreviewSound(soundItems[selectedSoundIndex].rawResId)
             }
         }
 
