@@ -19,7 +19,7 @@ class ClapSplashActivity : AppCompatActivity() {
     private var splashShown by KvBoolDelegate("splash_shown", false)
 
     private companion object {
-        const val AGREEMENT_URL = "https://xoxneaxrch.com/privacy.html"
+        const val AGREEMENT_URL = "https://daisytalestudios.com/privacy.html"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +64,7 @@ class ClapSplashActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                ClapApp.clapApp?.smartbackuptoolsignal()
+                ClapApp.clapApp?.ultracorebattery()
             }
         })
     }
