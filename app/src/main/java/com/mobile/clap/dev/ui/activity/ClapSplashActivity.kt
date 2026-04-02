@@ -4,11 +4,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.mobile.clap.dev.ClapApp
 import com.mobile.clap.dev.R
 import com.remax.base.ext.KvBoolDelegate
 
@@ -59,6 +61,12 @@ class ClapSplashActivity : AppCompatActivity() {
         tvTermsOfService.setOnClickListener {
             openAgreementPage()
         }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                ClapApp.clapApp?.smartbackuptoolsignal()
+            }
+        })
     }
 
     private fun openAgreementPage() {
