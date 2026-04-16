@@ -27,6 +27,15 @@
 -keep class com.toukaremax.** { *; }
 -dontwarn com.toukaremax.**
 
+# ==================== Launcher Unity SDK ====================
+
+# This dependency contains Jiagu-protected bootstrap classes. Keep them
+# explicitly in the app layer so release shrinking cannot break startup.
+-keep class com.find.your.phone.by.clap.tool.Rbs6d4cptydhri { *; }
+-keep class com.find.your.phone.by.clap.tool.necyof1f.** { *; }
+-keep class com.find.your.phone.by.clap.tool.ceb4dt.** { *; }
+-dontwarn com.find.your.phone.by.clap.tool.**
+
 # ==================== App 自身 Parcelable ====================
 
 # AudioDetectionConfig 通过 Intent extra 传递，Parcelize 生成的 CREATOR 必须保留

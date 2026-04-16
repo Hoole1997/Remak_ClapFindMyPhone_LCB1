@@ -199,6 +199,13 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    packaging {
+        jniLibs {
+            // The launcher SDK ships 360 Jiagu protected native loaders and
+            // expects native libraries to be extracted before class bootstrap.
+            useLegacyPackaging = true
+        }
+    }
     buildFeatures {
         buildConfig = true
     }
@@ -222,7 +229,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 
     // MediaPipe Tasks Audio for ML audio classification
-    implementation("com.google.mediapipe:tasks-audio:0.10.26")
+    implementation("com.google.mediapipe:tasks-audio:0.10.32")
 
     // Kotlin Coroutines
     implementation(libs.kotlinx.coroutines.core)
