@@ -88,6 +88,8 @@ class AdmobFullScreenNativeAdActivity : AppCompatActivity() {
     private val fullScreenNativeController = AdMobManager.Controllers.fullScreenNative
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Pre-install decor to avoid rare platform/SDK crashes when transitions touch it early.
+        window.decorView
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         window.apply {

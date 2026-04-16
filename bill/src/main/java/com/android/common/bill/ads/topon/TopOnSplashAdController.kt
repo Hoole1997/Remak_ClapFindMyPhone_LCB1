@@ -375,8 +375,22 @@ class TopOnSplashAdController private constructor() {
                 onLoaded?.invoke(true)
                 
                 // 3. 获取容器并显示广告
-                val container = activity.window.decorView.findViewById<ViewGroup>(android.R.id.content)
-                    ?: activity.window.decorView as ViewGroup
+                val container = findSafeContentContainer(activity)
+                if (container == null) {
+                    totalShowFailCount++
+                    AdEventReporter.reportShowFail(
+                        AdType.APP_OPEN,
+                        AdPlatform.TOPON,
+                        finalPlacementId,
+                        totalShowFailCount,
+                        "content container not ready",
+                        sessionId = currentSessionId,
+                        isPreload = currentIsPreload
+                    )
+                    return AdResult.Failure(
+                        createAdException("TopOn splash: content container not ready")
+                    )
+                }
                 
                 // 记录当前显示的广告和容器（用于资源释放）
                 currentShowingAd = cachedAd.splashAd
@@ -400,6 +414,11 @@ class TopOnSplashAdController private constructor() {
         }
 
         return adResult
+    }
+
+    private fun findSafeContentContainer(activity: FragmentActivity): ViewGroup? {
+        val decorView = activity.window.peekDecorView() as? ViewGroup ?: return null
+        return decorView.findViewById(android.R.id.content) ?: decorView
     }
 
     /**
