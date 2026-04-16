@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.mobile.clap.dev.BuildConfig
 import com.mobile.clap.dev.R
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var isDetectionOn by KvBoolDelegate("detection_on", false)
+    private var pendingDetectionRestore = false
     private var isUpdatingFromCode = false
 
     private lateinit var tvDetectionStatus: TextView
@@ -112,15 +114,28 @@ class MainActivity : AppCompatActivity() {
         setupListeners()
         setupDebugEntry()
         updateToggleUI(isDetectionOn, animate = false)
-        restoreDetectionState()
+        pendingDetectionRestore = isDetectionOn
         showGuideIfFirstLaunch()
         loadBannerAd()
     }
 
     private fun restoreDetectionState() {
-        if (isDetectionOn) {
-            val config = buildDetectionConfig()
-            AudioDetectionService.start(this, config)
+        if (!isDetectionOn) return
+
+        if (!hasAudioPermission()) {
+            Log.w(TAG, "Skipping detection restore because RECORD_AUDIO is not granted")
+            isDetectionOn = false
+            updateToggleUI(false, animate = false)
+            pendingDetectionRestore = false
+            return
+        }
+
+        val config = buildDetectionConfig()
+        val requestAccepted = AudioDetectionService.requestStart(this, config)
+        if (!requestAccepted) {
+            Log.w(TAG, "Failed to restore detection service from foreground state")
+            isDetectionOn = false
+            updateToggleUI(false, animate = false)
         }
     }
 
@@ -243,6 +258,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun enableDetection() {
         isDetectionOn = true
+        pendingDetectionRestore = false
         updateToggleUI(true, animate = true)
 
         // 总开关开启时，同时开启 Clap 和 Whistle（仅当两个都关闭时）
@@ -258,11 +274,17 @@ class MainActivity : AppCompatActivity() {
         // 启动前台检测服务（config 直接随 START intent 传递，避免竞态）
         val config = buildDetectionConfig()
         Log.d(TAG, "Detection enabled, config: clap=${config.handclapEnabled}, whistle=${config.whistleEnabled}, alertVol=${config.alertVolume}, soundIdx=${config.alertSoundIndex}")
-        AudioDetectionService.start(this, config)
+        val requestAccepted = AudioDetectionService.requestStart(this, config)
+        if (!requestAccepted) {
+            Log.w(TAG, "Detection service start request was rejected")
+            isDetectionOn = false
+            updateToggleUI(false, animate = true)
+        }
     }
 
     private fun disableDetection() {
         isDetectionOn = false
+        pendingDetectionRestore = false
         updateToggleUI(false, animate = true)
 
         // 总开关关闭时，同时关闭 Clap 和 Whistle
@@ -499,6 +521,18 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateAlertSoundDisplay()
+        if (pendingDetectionRestore) {
+            pendingDetectionRestore = false
+            window.decorView.post {
+                if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                    pendingDetectionRestore = isDetectionOn
+                    return@post
+                }
+                restoreDetectionState()
+            }
+            return
+        }
+
         // 从 AlertSoundActivity 返回后，将最新配置推送给服务
         updateServiceConfig()
     }

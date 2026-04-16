@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
@@ -18,6 +19,7 @@ import com.mobile.clap.dev.manager.DeviceAlertManager
 import com.mobile.clap.dev.ml.AudioDetectionConfig
 import com.mobile.clap.dev.ml.MlSoundDetector
 import com.mobile.clap.dev.ui.activity.MainActivity
+import com.remax.base.ext.kvEditor
 
 /**
  * 音频检测前台服务
@@ -29,29 +31,42 @@ class AudioDetectionService : Service() {
         private const val TAG = "AudioDetectionService"
         private const val NOTIFICATION_ID = 2001
         private const val CHANNEL_ID = "audio_detection_channel"
+        private const val DETECTION_ENABLED_KEY = "detection_on"
 
         const val ACTION_START = "com.mobile.clap.dev.START_DETECTION"
         const val ACTION_STOP = "com.mobile.clap.dev.STOP_DETECTION"
         const val ACTION_STOP_ALERT = "com.mobile.clap.dev.STOP_ALERT"
+        private const val FGS_START_NOT_ALLOWED_EXCEPTION =
+            "android.app.ForegroundServiceStartNotAllowedException"
 
         private const val ACTION_UPDATE_CONFIG = "com.mobile.clap.dev.UPDATE_CONFIG"
         private const val ACTION_PAUSE_DETECTION = "com.mobile.clap.dev.PAUSE_DETECTION"
         private const val ACTION_RESUME_DETECTION = "com.mobile.clap.dev.RESUME_DETECTION"
         private const val EXTRA_CONFIG = "extra_config"
 
-        fun start(context: Context, config: AudioDetectionConfig? = null) {
+        private fun isForegroundServiceStartNotAllowed(error: Throwable): Boolean {
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                    error.javaClass.name == FGS_START_NOT_ALLOWED_EXCEPTION
+        }
+
+        fun requestStart(context: Context, config: AudioDetectionConfig? = null): Boolean {
             val intent = Intent(context, AudioDetectionService::class.java).apply {
                 action = ACTION_START
                 config?.let { putExtra(EXTRA_CONFIG, it) }
             }
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(intent)
-                } else {
-                    context.startService(intent)
-                }
+            return try {
+                context.startForegroundService(intent)
+                true
+            } catch (e: SecurityException) {
+                Log.e(TAG, "Failed to start foreground service because the app is not eligible", e)
+                false
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to start foreground service: ${e.message}")
+                if (isForegroundServiceStartNotAllowed(e)) {
+                    Log.e(TAG, "Failed to start foreground service from background state", e)
+                } else {
+                    Log.e(TAG, "Failed to start foreground service", e)
+                }
+                false
             }
         }
 
@@ -116,7 +131,11 @@ class AudioDetectionService : Service() {
                     intent.getParcelableExtra(EXTRA_CONFIG)
                 }
                 startConfig?.let { config = it }
-                startDetection()
+                val started = startDetection()
+                if (!started) {
+                    stopSelfResult(startId)
+                    return START_NOT_STICKY
+                }
             }
             ACTION_STOP -> stopDetection()
             ACTION_STOP_ALERT -> stopCurrentAlert()
@@ -141,12 +160,15 @@ class AudioDetectionService : Service() {
         Log.d(TAG, "Service destroyed")
     }
 
-    private fun startDetection() {
+    private fun startDetection(): Boolean {
         Log.d(TAG, "Starting detection... config=$config")
         Log.d(TAG, "clap=${config.handclapEnabled}, whistle=${config.whistleEnabled}, alertVol=${config.alertVolume}, soundIdx=${config.alertSoundIndex}")
 
         // 启动前台服务
-        startForeground(NOTIFICATION_ID, createNotification())
+        if (!startMicrophoneForegroundService()) {
+            resetDetectionEnabledState()
+            return false
+        }
 
         // 获取 WakeLock 保持 CPU 运行
         acquireWakeLock()
@@ -162,6 +184,38 @@ class AudioDetectionService : Service() {
             onSoundDetected()
         }
         audioDetector?.startDetection()
+        return true
+    }
+
+    private fun startMicrophoneForegroundService(): Boolean {
+        val notification = createNotification()
+
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    NOTIFICATION_ID,
+                    notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                )
+            } else {
+                startForeground(NOTIFICATION_ID, notification)
+            }
+            true
+        } catch (e: SecurityException) {
+            Log.e(TAG, "System rejected microphone foreground service startup", e)
+            false
+        } catch (e: Exception) {
+            if (isForegroundServiceStartNotAllowed(e)) {
+                Log.e(TAG, "Foreground service startup not allowed in current app state", e)
+            } else {
+                Log.e(TAG, "Failed to promote detection service to foreground", e)
+            }
+            false
+        }
+    }
+
+    private fun resetDetectionEnabledState() {
+        kvEditor.putBoolean(DETECTION_ENABLED_KEY, false).apply()
     }
 
     private fun stopDetection() {
