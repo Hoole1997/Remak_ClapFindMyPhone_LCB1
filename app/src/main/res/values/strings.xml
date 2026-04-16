@@ -62,4 +62,5 @@
     <string name="notification_alerting_disable">Disable Clap &amp; Whistle Detection</string>
     <string name="notification_alerting_disable_short">Disable</string>
     <string name="permission_denied">Permission denied</string>
+    <string name="agreement_page_unavailable">Unable to open this page on this device.</string>
 </resources>

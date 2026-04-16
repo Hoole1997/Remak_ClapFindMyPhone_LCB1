@@ -3,6 +3,7 @@ package com.mobile.clap.dev.ui.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
@@ -71,12 +72,30 @@ class ClapSplashActivity : AppCompatActivity() {
 
     private fun openAgreementPage() {
         val agreementUri = Uri.parse(AGREEMENT_URL)
+        val browserIntent = Intent(Intent.ACTION_VIEW, agreementUri)
+        if (!canOpenIntent(browserIntent)) {
+            showAgreementUnavailableToast()
+            return
+        }
+
         val customTabsIntent = CustomTabsIntent.Builder().build()
 
         runCatching {
             customTabsIntent.launchUrl(this, agreementUri)
         }.onFailure {
-            startActivity(Intent(Intent.ACTION_VIEW, agreementUri))
+            runCatching {
+                startActivity(browserIntent)
+            }.onFailure {
+                showAgreementUnavailableToast()
+            }
         }
+    }
+
+    private fun canOpenIntent(intent: Intent): Boolean {
+        return intent.resolveActivity(packageManager) != null
+    }
+
+    private fun showAgreementUnavailableToast() {
+        Toast.makeText(this, R.string.agreement_page_unavailable, Toast.LENGTH_SHORT).show()
     }
 }
