@@ -2,6 +2,7 @@ package com.mobile.clap.dev.manager
 
 import android.content.Context
 import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -58,7 +59,13 @@ class DeviceAlertManager(
     private fun setupCamera() {
         try {
             cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-            rearCameraId = cameraManager?.cameraIdList?.firstOrNull()
+            rearCameraId = cameraManager?.cameraIdList?.firstOrNull { cameraId ->
+                val characteristics = cameraManager?.getCameraCharacteristics(cameraId)
+                characteristics?.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
+            }
+            if (rearCameraId == null) {
+                Log.w(TAG, "No camera with flash unit is available on this device")
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to setup camera", e)
         }
@@ -216,17 +223,24 @@ class DeviceAlertManager(
      * 开始闪光灯闪烁
      */
     private fun beginTorchBlink() {
+        val torchCameraId = rearCameraId
+        if (torchCameraId == null) {
+            Log.w(TAG, "Skipping torch alert because no flash-capable camera is available")
+            return
+        }
+
         torchJob = CoroutineScope(Dispatchers.IO).launch {
             var torchOn = false
             while (isRunning && isActive) {
                 try {
-                    rearCameraId?.let { id ->
-                        cameraManager?.setTorchMode(id, torchOn)
-                    }
+                    cameraManager?.setTorchMode(torchCameraId, torchOn)
                     torchOn = !torchOn
                     delay(TORCH_BLINK_INTERVAL_MS)
                 } catch (e: CameraAccessException) {
                     Log.e(TAG, "Failed to toggle torch", e)
+                    break
+                } catch (e: IllegalArgumentException) {
+                    Log.e(TAG, "Torch camera does not expose a flash unit", e)
                     break
                 }
             }
@@ -242,10 +256,12 @@ class DeviceAlertManager(
         torchJob = null
         
         try {
-            rearCameraId?.let { id ->
-                cameraManager?.setTorchMode(id, false)
+            rearCameraId?.let { cameraId ->
+                cameraManager?.setTorchMode(cameraId, false)
             }
             Log.d(TAG, "Torch blink stopped")
+        } catch (e: IllegalArgumentException) {
+            Log.w(TAG, "Skipping torch shutdown because selected camera has no flash unit", e)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to stop torch", e)
         }
