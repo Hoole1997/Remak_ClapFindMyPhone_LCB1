@@ -65,7 +65,7 @@ class ClapSplashActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                ClapApp.clapApp?.ultracorebattery()
+                ClapApp.clapApp?.restoreprolocker()
             }
         })
     }

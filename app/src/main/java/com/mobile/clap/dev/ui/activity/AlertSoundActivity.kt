@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.common.bill.ads.ext.AdShowExt
 import androidx.lifecycle.lifecycleScope
-import com.android.common.bill.ads.ext.AdShowExt.loadInterstitial
 import kotlinx.coroutines.launch
 import com.mobile.clap.dev.R
 import com.mobile.clap.dev.service.AudioDetectionService

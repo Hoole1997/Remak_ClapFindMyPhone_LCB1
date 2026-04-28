@@ -7,37 +7,31 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
-import com.android.common.bill.ads.renderer.AdmobFullScreenNativeAdRenderer
-import com.mobile.clap.dev.R
+import com.android.common.bill.ads.renderer.GamFullScreenNativeAdRenderer
+import com.google.android.libraries.ads.mobile.sdk.nativead.MediaView
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd
 import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdView
+import com.mobile.clap.dev.R
 
-class MyAdmobFullScreenNativeAdRenderer : AdmobFullScreenNativeAdRenderer {
-
+class DefaultGamFullScreenNativeAdRenderer : GamFullScreenNativeAdRenderer {
     override fun createLayout(context: Context): NativeAdView {
-        return LayoutInflater.from(context)
-            .inflate(R.layout.layout_full_native_ad_admob, null) as NativeAdView
+        return LayoutInflater.from(context).inflate(R.layout.layout_full_native_ad_admob, null) as NativeAdView
     }
 
-
-    override fun bindData(adView: NativeAdView, nativeAd: com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd, lifecycleOwner: LifecycleOwner) {
+    override fun bindData(adView: NativeAdView, nativeAd: NativeAd, lifecycleOwner: LifecycleOwner) {
         val titleView = adView.findViewById<TextView>(R.id.tv_ad_title)
         val descView = adView.findViewById<TextView>(R.id.tv_ad_description)
         val ctaButton = adView.findViewById<TextView>(R.id.btn_ad_cta)
         val iconView = adView.findViewById<ImageView>(R.id.iv_ad_icon)
-        val mediaView = adView.findViewById<com.google.android.libraries.ads.mobile.sdk.nativead.MediaView>(R.id.mv_ad_media)
+        val mediaView = adView.findViewById<MediaView>(R.id.mv_ad_media)
 
-        titleView?.text = nativeAd.headline ?: "Test Google Ads"
-        descView?.text = nativeAd.body ?: "Test Google Ads"
-        ctaButton?.text = nativeAd.callToAction ?: "Open"
-
-        nativeAd.icon?.let { icon ->
-            iconView?.setImageDrawable(icon.drawable)
-            iconView?.visibility = View.VISIBLE
-        } ?: run {
-            iconView?.setImageResource(android.R.drawable.ic_menu_info_details)
+        titleView?.text = nativeAd.headline.orEmpty()
+        descView?.text = nativeAd.body.orEmpty()
+        ctaButton?.text = nativeAd.callToAction ?: "OPEN"
+        nativeAd.icon?.drawable?.let {
+            iconView?.setImageDrawable(it)
             iconView?.visibility = View.VISIBLE
         }
-
         nativeAd.mediaContent?.let { mediaContent ->
             mediaView?.mediaContent = mediaContent
             mediaView?.visibility = View.VISIBLE
@@ -53,14 +47,11 @@ class MyAdmobFullScreenNativeAdRenderer : AdmobFullScreenNativeAdRenderer {
         adView.advertiserView = null
         adView.priceView = null
         adView.storeView = null
-
         adView.registerNativeAd(nativeAd, mediaView)
     }
 
     override fun createLoadingView(context: Context, container: ViewGroup) {
         container.removeAllViews()
-        val loadingView = LayoutInflater.from(context)
-            .inflate(R.layout.layout_fullscreen_loading, container, false)
-        container.addView(loadingView)
+        container.addView(LayoutInflater.from(context).inflate(R.layout.layout_fullscreen_loading, container, false))
     }
 }

@@ -189,8 +189,6 @@ dependencies {
     toponAdapterKwai()
     toponAdapterFyber()
     toponTramini()
-
-    api("com.launcher.unity:com.find.your.phone.by.clap.tool:1.0.1")
 }
 
 android {

@@ -6,13 +6,17 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.common.bill.ads.renderer.ToponNativeAdRenderer
+import com.android.common.bill.ui.topon.ToponNativeAdStyle
 import com.mobile.clap.dev.R
 import com.thinkup.nativead.api.TUNativeMaterial
 import com.thinkup.nativead.api.TUNativePrepareInfo
 
 class MyToponNativeAdRenderer : ToponNativeAdRenderer {
 
-    override fun createLayout(context: Context): ViewGroup {
+    override fun createLayout(
+        context: Context,
+        style: ToponNativeAdStyle
+    ): ViewGroup {
         return LayoutInflater.from(context)
             .inflate(R.layout.layout_native_ad_topon, null, false) as ViewGroup
     }

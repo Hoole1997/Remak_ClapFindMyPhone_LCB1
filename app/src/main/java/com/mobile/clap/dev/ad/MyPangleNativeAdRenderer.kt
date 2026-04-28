@@ -7,13 +7,17 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.common.bill.ads.renderer.PangleNativeAdRenderer
+import com.android.common.bill.ui.pangle.PangleNativeAdStyle
 import com.bytedance.sdk.openadsdk.api.nativeAd.PAGNativeAdData
 import com.bytedance.sdk.openadsdk.api.nativeAd.PAGViewBinder
 import com.mobile.clap.dev.R
 
 class MyPangleNativeAdRenderer : PangleNativeAdRenderer {
 
-    override fun createLayout(context: Context): ViewGroup {
+    override fun createLayout(
+        context: Context,
+        style: PangleNativeAdStyle
+    ): ViewGroup {
         return LayoutInflater.from(context)
             .inflate(R.layout.layout_native_ad_pangle, null, false) as ViewGroup
     }

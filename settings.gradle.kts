@@ -43,6 +43,12 @@ android {
     }
 }
 
+val buildConfigFile = file("build.config.properties")
+val buildConfig = Properties()
+if (buildConfigFile.exists()) {
+    buildConfig.load(buildConfigFile.inputStream())
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -97,6 +103,13 @@ dependencyResolutionManagement {
         }
         maven("https://cboost.jfrog.io/artifactory/chartboost-ads")
         maven("https://repo.dgtverse.cn/repository/maven-public")
+        maven {
+            url = uri("https://maven.pkg.github.com/toukaRemax/remax_sdk")
+            credentials {
+                username = buildConfig.getProperty("github.user") ?: System.getenv("GITHUB_ACTOR")
+                password = buildConfig.getProperty("github.token") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 
@@ -104,5 +117,5 @@ rootProject.name = "LCB_ClapFindMyPhone_variant_2"
 include(":app")
 include(":base")
 include(":analytics")
-include(":core")
-include(":bill")
+//include(":core")
+//include(":bill")

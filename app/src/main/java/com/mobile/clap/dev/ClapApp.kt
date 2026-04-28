@@ -11,6 +11,8 @@ import com.android.common.bill.ads.bidding.AppOpenBiddingInitializer
 import com.android.common.bill.ads.log.AdLogger
 import com.android.common.bill.ads.renderer.AdLoadingDialogRenderer
 import com.blankj.utilcode.util.LogUtils
+import com.mobile.clap.dev.ad.DefaultGamFullScreenNativeAdRenderer
+import com.mobile.clap.dev.ad.DefaultGamNativeAdRenderer
 import com.mobile.clap.dev.ad.MyAdmobFullScreenNativeAdRenderer
 import com.mobile.clap.dev.ad.MyAdmobNativeAdRenderer
 import com.mobile.clap.dev.ad.MyPangleFullScreenNativeAdRenderer
@@ -68,14 +70,24 @@ class ClapApp : com.find.your.phone.by.clap.tool.Rbs6d4cptydhri() {
         applicationScope.launch {
             Log.d("ClapApp", "AppOpenBiddingInitializer.initialize() starting...")
             AppOpenBiddingInitializer.initialize(this@ClapApp, R.mipmap.ic_launcher) {
+                googleMobileAds = BillConfig.GoogleMobileAdsConfig(
+                    applicationId = BuildConfig.ADMOB_APPLICATION_ID
+                )
                 admob = BillConfig.AdmobConfig(
-                    applicationId = BuildConfig.ADMOB_APPLICATION_ID,
                     splashId = BuildConfig.ADMOB_SPLASH_ID,
                     bannerId = BuildConfig.ADMOB_BANNER_ID,
                     interstitialId = BuildConfig.ADMOB_INTERSTITIAL_ID,
                     nativeId = BuildConfig.ADMOB_NATIVE_ID,
                     fullNativeId = BuildConfig.ADMOB_FULL_NATIVE_ID,
                     rewardedId = BuildConfig.ADMOB_REWARDED_ID
+                )
+                gam = BillConfig.GamConfig(
+                    splashId = BuildConfig.GAM_SPLASH_ID,
+                    bannerId = BuildConfig.GAM_BANNER_ID,
+                    interstitialId = BuildConfig.GAM_INTERSTITIAL_ID,
+                    nativeId = BuildConfig.GAM_NATIVE_ID,
+                    fullNativeId = BuildConfig.GAM_FULL_NATIVE_ID,
+                    rewardedId = BuildConfig.GAM_REWARDED_ID
                 )
                 pangle = BillConfig.PangleConfig(
                     applicationId = BuildConfig.PANGLE_APPLICATION_ID,
@@ -117,6 +129,8 @@ class ClapApp : com.find.your.phone.by.clap.tool.Rbs6d4cptydhri() {
 
                 admobNativeRenderer = MyAdmobNativeAdRenderer()
                 admobFullScreenNativeRenderer = MyAdmobFullScreenNativeAdRenderer()
+                gamNativeRenderer = DefaultGamNativeAdRenderer()
+                gamFullScreenNativeRenderer = DefaultGamFullScreenNativeAdRenderer()
                 pangleNativeRenderer = MyPangleNativeAdRenderer()
                 pangleFullScreenNativeRenderer = MyPangleFullScreenNativeAdRenderer()
                 toponNativeRenderer = MyToponNativeAdRenderer()
@@ -130,11 +144,11 @@ class ClapApp : com.find.your.phone.by.clap.tool.Rbs6d4cptydhri() {
         }
     }
 
-    override fun dailysafehub(): Class<in Any>? {
+    override fun autosecureprovault(): Class<in Any>? {
         return ClapSplashActivity::class.java as Class<in Any>?
     }
 
-    override fun restoreprolocker(): List<Class<in Any>?>? {
+    override fun scanfastcorememory(): List<Class<in Any>?>? {
         return listOf(
             ClapSplashActivity::class.java,
             MainActivity::class.java,

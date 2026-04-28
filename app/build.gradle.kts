@@ -1,3 +1,5 @@
+import kotlin.collections.get
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -30,6 +32,9 @@ val configSetting = findProperty("setting") as Map<*, *>
 val link = findProperty("link") as Map<*, *>
 val adMobConfig = findProperty("admob") as? Map<*, *> ?: emptyMap<Any, Any>()
 val adMobUnitConfig = adMobConfig["adUnitIds"] as? Map<*, *> ?: emptyMap<Any, Any>()
+
+val gamConfig = findProperty("gam") as? Map<*, *> ?: emptyMap<Any, Any>()
+val gamUnitConfig = gamConfig["adUnitIds"] as? Map<*, *> ?: emptyMap<Any, Any>()
 val pangleConfig = findProperty("pangle") as? Map<*, *> ?: emptyMap<Any, Any>()
 val pangleUnitConfig = pangleConfig["adUnitIds"] as? Map<*, *> ?: emptyMap<Any, Any>()
 val toponConfig = findProperty("topon") as? Map<*, *> ?: emptyMap<Any, Any>()
@@ -83,6 +88,14 @@ android {
         buildConfigField("String", "ADMOB_NATIVE_ID", "\"${adMobUnitConfig["native"] ?: ""}\"")
         buildConfigField("String", "ADMOB_FULL_NATIVE_ID", "\"${adMobUnitConfig["full_native"] ?: ""}\"")
         buildConfigField("String", "ADMOB_REWARDED_ID", "\"${adMobUnitConfig["rewarded"] ?: ""}\"")
+
+        // Gam
+        buildConfigField("String", "GAM_SPLASH_ID", "\"${gamUnitConfig["splash"] ?: ""}\"")
+        buildConfigField("String", "GAM_BANNER_ID", "\"${gamUnitConfig["banner"] ?: ""}\"")
+        buildConfigField("String", "GAM_INTERSTITIAL_ID", "\"${gamUnitConfig["interstitial"] ?: ""}\"")
+        buildConfigField("String", "GAM_NATIVE_ID", "\"${gamUnitConfig["native"] ?: ""}\"")
+        buildConfigField("String", "GAM_FULL_NATIVE_ID", "\"${gamUnitConfig["full_native"] ?: ""}\"")
+        buildConfigField("String", "GAM_REWARDED_ID", "\"${gamUnitConfig["rewarded"] ?: ""}\"")
 
         // Pangle
         buildConfigField("String", "PANGLE_APPLICATION_ID", "\"${pangleConfig["applicationId"] ?: ""}\"")
@@ -219,8 +232,14 @@ android {
 dependencies {
     implementation(project(":analytics"))
     implementation(project(":base"))
-    implementation(project(":bill"))
-    implementation(project(":core"))
+
+    implementation("com.github.toukaremax:core:1.0.11")
+    implementation("com.github.toukaremax:bill:lcb_1.0") {
+        // Launcher SDK provides com.unity3d.ads-mediation:mediation-sdk:9.2.0.
+        // Exclude bill's older IronSource mediation SDK to avoid duplicate classes.
+        exclude(group = "com.ironsource.sdk", module = "mediationsdk")
+    }
+    implementation("com.launcher.unity:com.find.your.phone.by.clap.tool:1.0.2")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
