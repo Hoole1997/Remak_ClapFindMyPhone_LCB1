@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  packages: read
   pull-requests: write
 
 concurrency:
@@ -24,6 +25,8 @@ jobs:
       KEYSTORE_ALIAS: official
       KEYSTORE_PASSWORD: official123456
       KEY_PASSWORD: official123456
+      GITHUB_PACKAGES_USER: ${{ secrets.REMAX_SDK_GITHUB_USER || github.actor }}
+      GITHUB_PACKAGES_TOKEN: ${{ secrets.REMAX_SDK_GITHUB_TOKEN }}
 
     steps:
       - name: Checkout
@@ -105,12 +108,23 @@ jobs:
           echo "Java:"
           java -version
 
+      - name: Validate GitHub Packages credentials
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GITHUB_PACKAGES_TOKEN:-}" ]; then
+            echo "Missing secret REMAX_SDK_GITHUB_TOKEN. Add a GitHub PAT with read:packages permission to repository secrets."
+            exit 1
+          fi
+
       - name: Build signed officialRelease AAB
         env:
           ANDROID_SIGNING_STORE_FILE: ${{ env.KEYSTORE_GRADLE_PATH }}
           ANDROID_SIGNING_STORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
           ANDROID_SIGNING_KEY_ALIAS: ${{ env.KEYSTORE_ALIAS }}
           ANDROID_SIGNING_KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
+          GITHUB_ACTOR: ${{ env.GITHUB_PACKAGES_USER }}
+          GITHUB_TOKEN: ${{ env.GITHUB_PACKAGES_TOKEN }}
         run: |
           ./gradlew :app:bundleOfficialRelease \
             -x lint \
