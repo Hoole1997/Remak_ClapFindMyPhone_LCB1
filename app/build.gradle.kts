@@ -161,18 +161,13 @@ android {
         create("official") {
             dimension = "distribution"
             applicationId = configSetting["applicationId"] as String
-            versionNameSuffix = "-official"
         }
     }
 
     buildTypes {
         debug {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             isShrinkResources = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
             configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
                 mappingFileUploadEnabled = false
             }
