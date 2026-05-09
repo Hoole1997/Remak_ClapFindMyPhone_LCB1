@@ -30,6 +30,8 @@ import com.mobile.clap.dev.ui.activity.ClapSplashActivity
 import com.mobile.clap.dev.ui.activity.DebugActivity
 import com.mobile.clap.dev.ui.activity.MainActivity
 import com.remax.analytics.adjust.AdjustController
+import com.remax.base.controller.UserChannelController
+import com.remax.base.utils.RemoteConfigManager
 import net.corekit.core.log.CoreLogger
 
 class ClapApp : com.find.your.phone.by.clap.tool.Rbs6d4cptydhri() {
@@ -50,8 +52,11 @@ class ClapApp : com.find.your.phone.by.clap.tool.Rbs6d4cptydhri() {
     override fun onCreate() {
         super.onCreate()
         clapApp = this
+        resetChannelToDefault(BuildConfig.DEFAULT_USER_CHANNEL)
+        RemoteConfigManager.initialize()
         CoreSdkTrackerBridge.initialize()
         this.smartcleancorewifi {isOrganic, network, campaign, adgroup, creative, jsonResponse ->
+            syncAttributedChannel(network, jsonResponse)
             AdjustController.initialize(
                 context = applicationContext,
                 network = network,
@@ -63,6 +68,26 @@ class ClapApp : com.find.your.phone.by.clap.tool.Rbs6d4cptydhri() {
             LogUtils.i("onCreate: isOrganic = $isOrganic , network = $network , campaign = $campaign , adgroup = $adgroup , creative = $creative , jsonResponse = $jsonResponse")
         }
         initAdSDK()
+    }
+
+    private fun resetChannelToDefault(defaultChannel: String) {
+        ChannelUserController.forceSetChannel(defaultChannel.toCoreChannelType())
+    }
+
+    private fun syncAttributedChannel(network: String?, jsonResponse: String?) {
+        val channelType = when (AdjustController.determineUserChannelType(network, jsonResponse)) {
+            UserChannelController.UserChannelType.NATURAL -> ChannelUserController.UserChannelType.NATURAL
+            UserChannelController.UserChannelType.PAID -> ChannelUserController.UserChannelType.PAID
+        }
+        ChannelUserController.forceSetChannel(channelType)
+    }
+
+    private fun String.toCoreChannelType(): ChannelUserController.UserChannelType {
+        return if (this == ChannelUserController.UserChannelType.PAID.value) {
+            ChannelUserController.UserChannelType.PAID
+        } else {
+            ChannelUserController.UserChannelType.NATURAL
+        }
     }
 
     private fun initAdSDK() {

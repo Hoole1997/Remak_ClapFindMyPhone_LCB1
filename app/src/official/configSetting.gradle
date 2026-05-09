@@ -4,8 +4,8 @@ ext {
                compileSdk   : 36,
                minSdk       : 26,
                targetSdk    : 36,
-               versionCode  : 3,
-               versionName  : "1.0.2"]
+               versionCode  : 4,
+               versionName  : "1.0.3"]
 
     link = [privacyUrl: "",
             teamUrl   : "",
@@ -66,5 +66,5 @@ ext {
     analytics = [adjustAppToken: "",
                  thinkingDataAppId: "",
                  thinkingDataServerUrl: "",
-                 defaultUserChannel: "paid"]
+                 defaultUserChannel: "natural"]
 }

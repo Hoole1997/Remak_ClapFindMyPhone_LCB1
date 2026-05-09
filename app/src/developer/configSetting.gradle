@@ -4,8 +4,8 @@ ext {
                compileSdk   : 36,
                minSdk       : 26,
                targetSdk    : 36,
-               versionCode  : 1,
-               versionName  : "1.0"]
+               versionCode  : 4,
+               versionName  : "1.0.3"]
 
     link = [privacyUrl: "",
             teamUrl   : "",
@@ -66,5 +66,5 @@ ext {
     analytics = [adjustAppToken: "f893ana7cbgg",                        // Adjust App Token
                  thinkingDataAppId: "babd72468c1c4ca6a4ca542f88c30c89", // 数数 SDK APP ID
                  thinkingDataServerUrl: "https://x-api.plectrapps.com",      // 数数上报域名
-                 defaultUserChannel: "paid"]                            // 默认用户渠道，internal
+                 defaultUserChannel: "natural"]                         // 默认用户渠道，归因异常时按自然量处理
 }

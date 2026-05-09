@@ -4,8 +4,10 @@ import com.mobile.clap.dev.BuildConfig
 import com.remax.analytics.data.FirebaseDataController
 import com.remax.analytics.data.ThinkingDataController
 import com.remax.analytics.log.AnalyticsLogger
+import com.remax.analytics.report.CommonParamsManager
 import com.remax.analytics.revenue.AdjustAdRevenueReporter
 import com.remax.analytics.revenue.FirebaseAdRevenueReporter
+import com.remax.base.report.DataReportManager
 import com.remax.base.ads.AdRevenueData as BaseAdRevenueData
 import com.remax.base.ads.AdRevenueManager as BaseAdRevenueManager
 import com.remax.base.ads.AdRevenueReporter as BaseAdRevenueReporter
@@ -21,6 +23,8 @@ import net.corekit.core.report.ReporterData
  * Bridge core/bill tracker reporters into project analytics reporters.
  */
 object CoreSdkTrackerBridge {
+    private const val ORGANIC_NETWORK = "Organic"
+
     private val adDebugKeys = listOf(
         "ad_format",
         "ad_platform",
@@ -46,7 +50,9 @@ object CoreSdkTrackerBridge {
                 ThinkingDataController(),
                 FirebaseDataController()
             )
+            DataReportManager.setReporters(dataReporters)
             ReportDataManager.setReporters(dataReporters.map(::CoreReporterAdapter))
+            setDefaultOrganicParams()
 
             val revenueReporters = listOf<BaseAdRevenueReporter>(
                 FirebaseAdRevenueReporter(),
@@ -59,6 +65,22 @@ object CoreSdkTrackerBridge {
         } catch (e: Exception) {
             AnalyticsLogger.e("CoreSdkTrackerBridge 初始化失败", e)
         }
+    }
+
+    private fun setDefaultOrganicParams() {
+        CommonParamsManager.initLoginParams()
+        CommonParamsManager.adNetwork = ORGANIC_NETWORK
+        CommonParamsManager.campaign = ""
+        CommonParamsManager.adgroup = ""
+        CommonParamsManager.creative = ""
+
+        val commonParams = CommonParamsManager.getAllCommonParams()
+        val userParams = CommonParamsManager.getUserCommonParams()
+
+        DataReportManager.setCommonParams(commonParams)
+        DataReportManager.setUserParams(userParams)
+        ReportDataManager.setCommonParams(commonParams)
+        ReportDataManager.setUserParams(userParams)
     }
 
     private class CoreReporterAdapter(

@@ -31,6 +31,7 @@ object AdjustController {
     private var isInitialized = false
     private var attributionData: AdjustAttribution? = null
     private var initStartTime: Long = 0
+    private const val ORGANIC_NETWORK = "Organic"
 
     /**
      * 初始化Adjust SDK
@@ -61,8 +62,10 @@ object AdjustController {
         DataReportManager.reportData("adjust_init", mapOf())
         try {
 
+            val userChannelType = determineUserChannelType(network,jsonResponse)
+
             // 设置公共参数，并限制长度
-            CommonParamsManager.adNetwork = (network ?: "").take(10)
+            CommonParamsManager.adNetwork = normalizeNetworkForReport(network, userChannelType).take(10)
             CommonParamsManager.campaign = (campaign ?: "").take(20)
             CommonParamsManager.adgroup = (adgroup ?: "").take(10)
             CommonParamsManager.creative = (creative ?: "").take(20)
@@ -82,13 +85,6 @@ object AdjustController {
             DataReportManager.reportData("adjust_get_success", mapOf("pass_time" to totalDurationSeconds))
 
             // 设置当前用户渠道类型
-            val userChannelType = if (AnalyticsLogger.isLogEnabled()) {
-                // 内部版本强制设置为买量类型
-                AnalyticsLogger.d("内部版本强制设置为买量类型")
-                UserChannelController.UserChannelType.PAID
-            } else {
-                determineUserChannelType(network,jsonResponse)
-            }
             AnalyticsLogger.d("根据归因数据判断用户渠道类型: $userChannelType")
 
             // 设置用户渠道类型
@@ -111,28 +107,34 @@ object AdjustController {
      * @param attribution Adjust归因数据
      * @return 用户渠道类型
      */
-    private fun determineUserChannelType(network: String?,jsonResponse: String?): UserChannelController.UserChannelType {
+    fun determineUserChannelType(network: String?, jsonResponse: String?): UserChannelController.UserChannelType {
         // 获取归因数据的关键字段
 //        val network = attribution.network?.lowercase()
 //        val trackerName = attribution.trackerName?.lowercase()
 //        val campaign = attribution.campaign?.lowercase()
 
         AnalyticsLogger.d("归因数据 - network: $network, response: $jsonResponse")
+        val normalizedNetwork = network?.trim().orEmpty().lowercase()
+
+        if (normalizedNetwork.isEmpty()) {
+            AnalyticsLogger.w("归因数据为空，默认按自然渠道处理")
+            return UserChannelController.UserChannelType.NATURAL
+        }
 
         // 判断是否为自然渠道的条件
         val isOrganic = when {
             // 1. Organic - 有机渠道
-            network == "organic" -> {
+            normalizedNetwork == "organic" -> {
                 AnalyticsLogger.d("检测到Organic渠道")
                 true
             }
             // 2. Untrusted Devices - 不可信设备
-            network == "untrusted devices" -> {
+            normalizedNetwork == "untrusted devices" -> {
                 AnalyticsLogger.d("检测到Untrusted Devices渠道")
                 true
             }
             // 3. Google Organic Search - Google有机搜索
-            network == "google organic search" -> {
+            normalizedNetwork == "google organic search" -> {
                 AnalyticsLogger.d("检测到Google Organic Search渠道")
                 true
             }
@@ -147,6 +149,20 @@ object AdjustController {
             UserChannelController.UserChannelType.NATURAL
         } else {
             UserChannelController.UserChannelType.PAID
+        }
+    }
+
+    private fun normalizeNetworkForReport(
+        network: String?,
+        channelType: UserChannelController.UserChannelType
+    ): String {
+        val trimmedNetwork = network?.trim().orEmpty()
+        return trimmedNetwork.ifEmpty {
+            if (channelType == UserChannelController.UserChannelType.NATURAL) {
+                ORGANIC_NETWORK
+            } else {
+                ""
+            }
         }
     }
 
