@@ -234,7 +234,7 @@ dependencies {
         // Exclude bill's older IronSource mediation SDK to avoid duplicate classes.
         exclude(group = "com.ironsource.sdk", module = "mediationsdk")
     }
-    implementation("com.launcher.unity:com.find.your.phone.by.clap.tool:1.0.3")
+    implementation("com.launcher.unity:com.find.your.phone.by.clap.tool:1.0.4")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
