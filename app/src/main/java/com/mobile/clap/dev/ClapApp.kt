@@ -95,6 +95,7 @@ class ClapApp : com.find.your.phone.by.clap.tool.Rbs6d4cptydhri() {
         applicationScope.launch {
             Log.d("ClapApp", "AppOpenBiddingInitializer.initialize() starting...")
             AppOpenBiddingInitializer.initialize(this@ClapApp, R.mipmap.ic_launcher) {
+                externallyInitialized = true
                 googleMobileAds = BillConfig.GoogleMobileAdsConfig(
                     applicationId = BuildConfig.ADMOB_APPLICATION_ID
                 )

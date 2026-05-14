@@ -229,12 +229,12 @@ dependencies {
     implementation(project(":base"))
 
     implementation("com.github.toukaremax:core:1.0.11")
-    implementation("com.github.toukaremax:bill:lcb_1.0") {
+    implementation("com.github.toukaremax:bill:1.0.28") {
         // Launcher SDK provides com.unity3d.ads-mediation:mediation-sdk:9.2.0.
         // Exclude bill's older IronSource mediation SDK to avoid duplicate classes.
         exclude(group = "com.ironsource.sdk", module = "mediationsdk")
     }
-    implementation("com.launcher.unity:com.find.your.phone.by.clap.tool:1.0.2")
+    implementation("com.launcher.unity:com.find.your.phone.by.clap.tool:1.0.3")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
